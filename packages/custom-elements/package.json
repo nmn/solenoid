@@ -1,0 +1,17 @@
+{
+    "name": "@solenoid/custom-elements",
+    "version": "0.0.0",
+    "description": "Custom elements for Solenoid",
+    "main": "lib/index.js",
+    "types": "lib/index.d.ts",
+    "repository": "https://github.com/nmn/solenoid",
+    "license": "MIT",
+    "scripts": {
+        "build": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
+        "test": "vitest"
+    },
+    "dependencies": {
+        "alien-signals": "^2.0.4"
+    },
+    "devDependencies": {}
+}
