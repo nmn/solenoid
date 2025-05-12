@@ -15,11 +15,32 @@ export type SignalSerialized = {
 export type Signal<T> = ReturnType<typeof signal<T>>;
 export type ServerSignal<T> = Signal<T> & SignalSerialized;
 
-export type Function = {
+// const fn = (times: number) => count() * times;
+// const fn_compiled  = Object.assign(
+//   (times: number) => count() * times,
+//   {
+//     __type: '$$FUNCTION',
+//     hash: "kjshfjksfh",
+//     closure: [count],
+//     toString: () => `($c1) => ($a1) => $c1() * $a1`,
+//     args: [],
+//   }
+// );
+
+// import fnHashed from "/static/fns/doubleCount-hashed.js";
+
+// const fn_eventually  = functionConfig("doubleCount-hashed").bind(count);
+
+
+export type FunctionConfig = {
   __type: typeof FUNCTION;
-  module: string;
+  module: string; // "/static/fns/jkshfkjsf.js"
   closure: unknown[];
   args?: unknown[];
+};
+
+declare const window: {
+  __FNS__: Record<string, (...args: any[]) => any>;
 };
 
 const hydrateJSON = async (value: unknown) => {
@@ -30,8 +51,8 @@ const hydrateJSON = async (value: unknown) => {
   if (typeof value === "object" && value !== null) {
     if ('__type' in value) {
       if (value.__type === FUNCTION || value.__type === '$$FUNCTION') {
-        const fnObj = value as Function;
-        const fnPromise = import(fnObj.module);
+        const fnObj = value as FunctionConfig;
+        const fnPromise = window.__FNS__[fnObj.module] ?? import(fnObj.module);
         const closurePromises = Promise.all(fnObj.closure.map(hydrateJSON));
         const argsPromises = Promise.all(fnObj.args?.map(hydrateJSON) ?? []);
 
@@ -120,4 +141,5 @@ class SignalStore {
     return signal;
   }
 }
+
 export const signalStore = new SignalStore();

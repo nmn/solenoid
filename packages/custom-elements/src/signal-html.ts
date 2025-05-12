@@ -3,6 +3,38 @@ import { JSON_PARSE } from "./core";
 import { signalStore } from "./signal-store-instance";
 
 export class SignalText extends HTMLElement {
+  /*
+  JSX:
+  <div>
+    {count()}
+  </div>
+
+  HTML:
+  <let-signal name="$FN_countd8734" initialValue="0"></let-signal>
+  <script>
+    window.signals.count = createSignal("count", 0);
+  </script>
+  <div>
+    <script>
+      window.__FNS__ = {};
+      window.__SOLENOID__.$FN_countd8734 = ($c1) => ($a1: number) => $c1() * $a1;
+    </script>
+    <signal-text value=`{__type: "FUNCTION", id: "$FN_countd8734", closureArgs: [{
+      name: "count",
+      __type: "$$SIGNAL"
+    }]}`>0</signal-text>
+    <await-suspense>
+      <template data-fallback>
+        Loading...
+      </template>
+      <template data-children>
+        <async-data source="skhgfjkhgs">
+          <signal-text value="skhgfjkhgs-dereived"></signal-text>
+        </async-data>
+      </template>
+    </await-suspense>
+  </div>
+  */
   static observedAttributes = ["value"];
 
   private value: () => unknown;
@@ -17,6 +49,9 @@ export class SignalText extends HTMLElement {
     }
     this.isConnected = true;
     const parsedValue = await JSON_PARSE(value);
+    if (!this.isConnected) {
+      return;
+    }
 
     if (parsedValue && typeof parsedValue === "function") {
       this.value = parsedValue;
@@ -43,6 +78,20 @@ export class SignalText extends HTMLElement {
 }
 
 export class SignalAttrs extends HTMLElement {
+
+  /*
+  JSX:
+  <div className={count() % 2 === 0 ? "even" : "odd"}>
+    some text
+  </div>
+
+  HTML:
+  <signal-attrs value='{"className": count() % 2 === 0 ? "even" : "odd"}'>
+    <div className="even">
+      some text
+    </div>
+  </signal-attrs>
+  */
   static observedAttributes = ["value"];
 
   private value: () => ({[key: string]: unknown});
@@ -78,6 +127,7 @@ export class SignalAttrs extends HTMLElement {
         this.abortController = new AbortController();
         Object.keys(latestAttrs).forEach((key) => {
           if (key.match(/^on[A-Z]/)) {
+            // Wasteful right now, but ok
             // Event listener exists, add it
             childElement.addEventListener(
               key.slice(2).toLowerCase(),

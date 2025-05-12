@@ -3,26 +3,28 @@ import { type Signal, createSignal, signalStore } from "./core";
 
 export class LetSignal<T> extends HTMLElement {
   static observedAttributes = ["name", "initial-value"];
-  
+
   ready = false;
   signal: Signal<T>;
   name: string;
-  
+  initialValue: T;
+
   constructor() {
     super();
-    
+
     const name = this.getAttribute("name");
     if (!name) {
       throw new Error("let-signal must have a name attribute");
     }
-    this.name = name;
 
-    const initialValue = JSON.parse(this.getAttribute("initial-value") || "null");
-    this.signal = createSignal(name, initialValue);
-    signalStore.set(this.name, this.signal);
+    this.name = name;
+    this.initialValue = JSON.parse(this.getAttribute("initial-value") || "null");
   }
 
-  // connectedCallback() {}
+  connectedCallback() {
+    this.signal = createSignal(this.name, this.initialValue);
+    signalStore.set(this.name, this.signal);
+  }
 
   // This should never happen, but keeping it for completeness
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
