@@ -7,11 +7,12 @@
     "repository": "https://github.com/nmn/solenoid",
     "license": "MIT",
     "scripts": {
-        "build": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
-        "test": "vitest"
+        "watch": "bun build --outfile=lib/index.js ./src/index.ts --watch",
+        "build": "bun build --minify --production --target=browser --outfile=lib/index.js ./src/index.ts"
     },
     "dependencies": {
-        "alien-signals": "^2.0.4"
+        "alien-signals": "^2.0.4",
+        "lodash.debounce": "^4.0.8"
     },
     "devDependencies": {}
 }

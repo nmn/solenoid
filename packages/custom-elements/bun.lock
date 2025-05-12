@@ -1,0 +1,17 @@
+{
+  "lockfileVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "@solenoid/custom-elements",
+      "dependencies": {
+        "alien-signals": "^2.0.4",
+        "lodash.debounce": "^4.0.8",
+      },
+    },
+  },
+  "packages": {
+    "alien-signals": ["alien-signals@2.0.4", "", {}, "sha512-3QsszrrJN/VtQxyQcc0I+Mn758aGB5WCBCm55x9twfRimD9fWsQ/3iyVmUJwCdr1ovnmT7wRX1sq4j8sQiTixA=="],
+
+    "lodash.debounce": ["lodash.debounce@4.0.8", "", {}, "sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow=="],
+  }
+}

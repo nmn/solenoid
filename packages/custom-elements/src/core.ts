@@ -143,3 +143,5 @@ class SignalStore {
 }
 
 export const signalStore = new SignalStore();
+
+window.signalStore = signalStore;

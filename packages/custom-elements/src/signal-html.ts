@@ -1,6 +1,6 @@
 import { effect, effectScope } from "alien-signals";
+import debounce from "lodash.debounce";
 import { JSON_PARSE } from "./core";
-import { signalStore } from "./signal-store-instance";
 
 export class SignalText extends HTMLElement {
   /*
@@ -40,6 +40,7 @@ export class SignalText extends HTMLElement {
   private value: () => unknown;
   isConnected = true;
   private cleanUp: void | (() => void);
+  private _observer: MutationObserver;
 
   async connectedCallback() {
     if (!this.isConnected) return;
@@ -55,13 +56,20 @@ export class SignalText extends HTMLElement {
 
     if (parsedValue && typeof parsedValue === "function") {
       this.value = parsedValue;
+
+      this._observer = new MutationObserver(() => {
+        this.render();
+      });
+      this._observer.observe(this, { childList: true, subtree: true });
+
       this.render();
     } else {
       this.isConnected = false;
     }
   }
 
-  private render(value?: unknown) {
+  render = debounce((value?: unknown) => {
+    this.cleanUp?.();
     const stopScope = effectScope(() => {
       effect(() => {
         const latestText = this.value();
@@ -69,13 +77,14 @@ export class SignalText extends HTMLElement {
       });
     });
     this.cleanUp = stopScope;
-  }
+  }, 16);
 
   disconnectedCallback() {
     this.cleanUp?.();
     this.isConnected = false;
   }
 }
+customElements.define("signal-text", SignalText);
 
 export class SignalAttrs extends HTMLElement {
 
@@ -98,6 +107,7 @@ export class SignalAttrs extends HTMLElement {
   isConnected = true;
   private cleanUp: void | (() => void);
   private abortController: AbortController = new AbortController();
+  private _observer: MutationObserver | null = null;
 
   async connectedCallback() {
     if (!this.isConnected) return;
@@ -110,13 +120,18 @@ export class SignalAttrs extends HTMLElement {
 
     if (parsedValue && typeof parsedValue === "function") {
       this.value = parsedValue;
+      this._observer = new MutationObserver(() => {
+        this.render();
+      });
+      this._observer.observe(this, { childList: true, subtree: true });
+
       this.render();
     } else {
       this.isConnected = false;
     }
   }
 
-  private render(value?: unknown) {
+  render = debounce((value?: unknown) => {
     // There should only ever be a single child element
     const childElement = this.children[0] as HTMLElement;
     const stopScope = effectScope(() => {
@@ -146,10 +161,12 @@ export class SignalAttrs extends HTMLElement {
       });
     });
     this.cleanUp = stopScope;
-  }
+  }, 16);
 
   disconnectedCallback() {
     this.cleanUp?.();
     this.isConnected = false;
   }
 }
+
+customElements.define("signal-attrs", SignalAttrs);

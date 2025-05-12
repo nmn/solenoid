@@ -1,0 +1,28 @@
+<html>
+    <head>
+        <title>
+            Counter Test
+        </title>
+        <script src="../lib/index.js"></script>
+    </head>
+    <let-signal name="count" initial-value="0"></let-signal>
+    <script>
+      window.__FNS__ ??= {};
+      window.__FNS__.decr = ($c1) => () => $c1($c1() - 1);
+      window.__FNS__.decAttrs = ($c1) => () => ({onClick: $c1});
+    </script>
+    <signal-attrs value='{"__type":"$$FUNCTION","module":"decAttrs","closure":[{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
+        <button>+</button>
+    </signal-attrs>
+    <signal-text value='{"__type":"$$SIGNAL","id":"count"}'>
+        0
+    </signal-text>
+    <script>
+      window.__FNS__ ??= {};
+      window.__FNS__.incr = ($c1) => () => $c1($c1() + 1);
+      window.__FNS__.attrs = ($c1) => () => ({onClick: $c1});
+    </script>
+    <signal-attrs value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
+        <button>+</button>
+    </signal-attrs>
+</html>
