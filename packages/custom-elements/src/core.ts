@@ -1,7 +1,6 @@
-import { type SolenoidSignal } from "./utils/solenoid-configs";
-
 import { signal } from "alien-signals";
-import { getSolenoidConfigFromValue, isSolenoidObject, isSolenoidFunction, isSolenoidSignal, solenize, SOLENOID_OBJECT_TYPES } from "./utils/solenoid-configs";
+import { SOLENOID_OBJECT_TYPES, type SolenoidSignal } from "./utils/solenoid-config-types";
+import { getSolenoidConfigFromValue, isSolenoidObject, isSolenoidFunction, isSolenoidSignal, solenize } from "./utils/solenoid-config-helpers";
 
 // declare const TEffect: unique symbol;
 // const EFFECT = Symbol("EFFECT") as typeof TEffect;
