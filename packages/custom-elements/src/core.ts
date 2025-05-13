@@ -1,46 +1,13 @@
 import { signal } from "alien-signals";
-
-declare const TFunction: unique symbol;
-const FUNCTION = Symbol("FUNCTION") as typeof TFunction;
-
-declare const TSignal: unique symbol;
-const SIGNAL = Symbol("SIGNAL") as typeof TSignal;
+import { SOLENOID_OBJECT_TYPES, type SolenoidSignal } from "./utils/solenoid-config-types";
+import { getSolenoidConfigFromValue, isSolenoidObject, isSolenoidFunction, isSolenoidSignal, solenize } from "./utils/solenoid-config-helpers";
 
 // declare const TEffect: unique symbol;
 // const EFFECT = Symbol("EFFECT") as typeof TEffect;
-export type SignalSerialized = {
-  __type: typeof SIGNAL;
-  id: string;
-};
-export type Signal<T> = ReturnType<typeof signal<T>>;
-export type ServerSignal<T> = Signal<T> & SignalSerialized;
-
-// const fn = (times: number) => count() * times;
-// const fn_compiled  = Object.assign(
-//   (times: number) => count() * times,
-//   {
-//     __type: '$$FUNCTION',
-//     hash: "kjshfjksfh",
-//     closure: [count],
-//     toString: () => `($c1) => ($a1) => $c1() * $a1`,
-//     args: [],
-//   }
-// );
-
-// import fnHashed from "/static/fns/doubleCount-hashed.js";
-
-// const fn_eventually  = functionConfig("doubleCount-hashed").bind(count);
-
-
-export type FunctionConfig = {
-  __type: typeof FUNCTION;
-  module: string; // "/static/fns/jkshfkjsf.js"
-  closure: unknown[];
-  args?: unknown[];
-};
 
 declare const window: {
   __FNS__: Record<string, (...args: any[]) => any>;
+  signalStore: SignalStore;
 };
 
 const hydrateJSON = async (value: unknown) => {
@@ -49,9 +16,9 @@ const hydrateJSON = async (value: unknown) => {
   }
 
   if (typeof value === "object" && value !== null) {
-    if ('__type' in value) {
-      if (value.__type === FUNCTION || value.__type === '$$FUNCTION') {
-        const fnObj = value as FunctionConfig;
+    if (isSolenoidObject(value)) {
+      if (isSolenoidFunction(value)) {
+        const fnObj = getSolenoidConfigFromValue(value);
         const fnPromise = window.__FNS__[fnObj.module] ?? import(fnObj.module);
         const closurePromises = Promise.all(fnObj.closure.map(hydrateJSON));
         const argsPromises = Promise.all(fnObj.args?.map(hydrateJSON) ?? []);
@@ -60,8 +27,8 @@ const hydrateJSON = async (value: unknown) => {
         return (...args: any[]) =>
           fn(...closure)(...boundArgs, ...args);
       }
-      if (value.__type === SIGNAL || value.__type === '$$SIGNAL') {
-        const signalObj = value as SignalSerialized;
+      if (isSolenoidSignal(value)) {
+        const signalObj = getSolenoidConfigFromValue(value);
         return await signalStore.awaitGet(signalObj.id);
       }
     }
@@ -92,25 +59,21 @@ export const JSON_PARSE = async (value: string) => {
 }
 
 
-export function createSignal<T>(id: string, initialValue: T): Signal<T> {
+export function createSignal<T>(id: string, initialValue: T): SolenoidSignal<T> {
   const s = signal(initialValue);
-  // @ts-ignore
-  s.__type = SIGNAL;
-  // @ts-ignore
-  s.id = id;
 
-  return s as Signal<T>;
+  return solenize(s, {__type: SOLENOID_OBJECT_TYPES.Signal, id});
 }
 
 
 class SignalStore {
-  store = new Map<string, Signal<any>>();
+  store = new Map<string, SolenoidSignal<any>>();
   resolvers = new Map<string, ((value: any) => void)>();
 
   get(id: string) {
     return this.store.get(id);
   }
-  set(id: string, value: Signal<any>) {
+  set(id: string, value: SolenoidSignal<any>) {
     return this.store.set(id, value)
   }
   delete(id: string) {
@@ -128,10 +91,10 @@ class SignalStore {
   entries() {
     return this.store.entries()
   }
-  forEach(callback: (value: Signal<any>, key: string, map: Map<string, Signal<any>>) => void) {
+  forEach(callback: (value: SolenoidSignal<any>, key: string, map: Map<string, SolenoidSignal<any>>) => void) {
     this.store.forEach(callback);
   }
-  async awaitGet(id: string): Promise<Signal<any>> {
+  async awaitGet(id: string): Promise<SolenoidSignal<any>> {
     const signal = this.store.get(id);
     if (signal == null) {
       const {promise, resolve, reject} = Promise.withResolvers()
