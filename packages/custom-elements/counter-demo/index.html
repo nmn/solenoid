@@ -7,22 +7,34 @@
     </head>
     <let-signal name="count" initial-value="0"></let-signal>
     <script>
-      window.__FNS__ ??= {};
       window.__FNS__.decr = ($c1) => () => $c1($c1() - 1);
       window.__FNS__.decAttrs = ($c1) => () => ({onClick: $c1});
     </script>
     <signal-attrs value='{"__type":"$$FUNCTION","module":"decAttrs","closure":[{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
-        <button>+</button>
+        <button>-</button>
     </signal-attrs>
     <signal-text value='{"__type":"$$SIGNAL","id":"count"}'>
         0
     </signal-text>
     <script>
-      window.__FNS__ ??= {};
       window.__FNS__.incr = ($c1) => () => $c1($c1() + 1);
       window.__FNS__.attrs = ($c1) => () => ({onClick: $c1});
+      window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
+      window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
     </script>
     <signal-attrs value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
         <button>+</button>
     </signal-attrs>
+    <br/>
+    <br/>
+    <script>
+      window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
+      window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
+    </script>
+    <show-when condition='{"__type":"$$FUNCTION","module":"whenEven","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>
+        is Even!
+    </show-when>
+    <show-when condition='{"__type":"$$FUNCTION","module":"whenOdd","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>
+        is Odd!
+    </show-when>
 </html>

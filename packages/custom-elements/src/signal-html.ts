@@ -57,18 +57,13 @@ export class SignalText extends HTMLElement {
     if (parsedValue && typeof parsedValue === "function") {
       this.value = parsedValue;
 
-      this._observer = new MutationObserver(() => {
-        this.render();
-      });
-      this._observer.observe(this, { childList: true, subtree: true });
-
-      this.render();
+      requestAnimationFrame(() => this.render());
     } else {
       this.isConnected = false;
     }
   }
 
-  render = debounce((value?: unknown) => {
+  render(value?: unknown) {
     this.cleanUp?.();
     const stopScope = effectScope(() => {
       effect(() => {
@@ -77,7 +72,7 @@ export class SignalText extends HTMLElement {
       });
     });
     this.cleanUp = stopScope;
-  }, 16);
+  };
 
   disconnectedCallback() {
     this.cleanUp?.();
@@ -107,7 +102,6 @@ export class SignalAttrs extends HTMLElement {
   isConnected = true;
   private cleanUp: void | (() => void);
   private abortController: AbortController = new AbortController();
-  private _observer: MutationObserver | null = null;
 
   async connectedCallback() {
     if (!this.isConnected) return;
@@ -120,18 +114,14 @@ export class SignalAttrs extends HTMLElement {
 
     if (parsedValue && typeof parsedValue === "function") {
       this.value = parsedValue;
-      this._observer = new MutationObserver(() => {
-        this.render();
-      });
-      this._observer.observe(this, { childList: true, subtree: true });
 
-      this.render();
+      requestAnimationFrame(() => this.render());
     } else {
       this.isConnected = false;
     }
   }
 
-  render = debounce((value?: unknown) => {
+  render(value?: unknown) {
     // There should only ever be a single child element
     const childElement = this.children[0] as HTMLElement;
     const stopScope = effectScope(() => {
@@ -161,7 +151,7 @@ export class SignalAttrs extends HTMLElement {
       });
     });
     this.cleanUp = stopScope;
-  }, 16);
+  };
 
   disconnectedCallback() {
     this.cleanUp?.();
@@ -170,3 +160,56 @@ export class SignalAttrs extends HTMLElement {
 }
 
 customElements.define("signal-attrs", SignalAttrs);
+
+
+export class ShowWhen extends HTMLElement {
+  static observedAttributes = ["condition"];
+
+  private condition: () => unknown;
+  isConnected = true;
+  private cleanUp: void | (() => void);
+  private templateHTML: string | null = null;
+
+  async connectedCallback() {
+    if (!this.isConnected) return;
+    const condition = this.getAttribute("condition");
+    if (!condition) {
+      throw new Error("signal-text must have a condition attribute");
+    }
+    this.isConnected = true;
+    const parsedValue = await JSON_PARSE(condition);
+    if (!this.isConnected) {
+      return;
+    }
+
+    if (parsedValue && typeof parsedValue === "function") {
+      this.condition = parsedValue;
+
+      requestAnimationFrame(() => this.render());
+    } else {
+      this.isConnected = false;
+    }
+  }
+
+  render(value?: unknown) {
+    this.cleanUp?.();
+    this.templateHTML ??= this.innerHTML;
+    const stopScope = effectScope(() => {
+      effect(() => {
+        if (this.condition()) {
+          this.innerHTML = this.templateHTML!;
+        } else {
+          this.templateHTML = this.innerHTML.trim() ?? this.templateHTML;
+          this.innerHTML = "";
+        }
+      });
+    });
+    this.cleanUp = stopScope;
+  };
+
+  disconnectedCallback() {
+    this.cleanUp?.();
+    this.isConnected = false;
+  }
+}
+customElements.define("show-when", ShowWhen);

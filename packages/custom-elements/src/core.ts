@@ -1,9 +1,5 @@
 import { signal } from "alien-signals";
-import { SOLENOID_OBJECT_TYPES, type SolenoidSignal } from "./utils/solenoid-config-types";
-import { getSolenoidConfigFromValue, isSolenoidObject, isSolenoidFunction, isSolenoidSignal, solenize } from "./utils/solenoid-config-helpers";
-
-// declare const TEffect: unique symbol;
-// const EFFECT = Symbol("EFFECT") as typeof TEffect;
+import { isSolenoidFunction, isSolenoidSignal, type Signal } from "./utils/types";
 
 declare const window: {
   __FNS__: Record<string, (...args: any[]) => any>;
@@ -16,22 +12,21 @@ const hydrateJSON = async (value: unknown) => {
   }
 
   if (typeof value === "object" && value !== null) {
-    if (isSolenoidObject(value)) {
-      if (isSolenoidFunction(value)) {
-        const fnObj = getSolenoidConfigFromValue(value);
-        const fnPromise = window.__FNS__[fnObj.module] ?? import(fnObj.module);
-        const closurePromises = Promise.all(fnObj.closure.map(hydrateJSON));
-        const argsPromises = Promise.all(fnObj.args?.map(hydrateJSON) ?? []);
+    if (isSolenoidFunction(value)) {
+      const fnObj = value;
+      const fnPromise = window.__FNS__[fnObj.module] ?? import(fnObj.module);
+      const closurePromises = Promise.all(fnObj.closure.map(hydrateJSON));
+      const argsPromises = Promise.all(fnObj.args?.map(hydrateJSON) ?? []);
 
-        const [fn, closure, boundArgs] = await Promise.all([fnPromise, closurePromises, argsPromises]);
-        return (...args: any[]) =>
-          fn(...closure)(...boundArgs, ...args);
-      }
-      if (isSolenoidSignal(value)) {
-        const signalObj = getSolenoidConfigFromValue(value);
-        return await signalStore.awaitGet(signalObj.id);
-      }
+      const [fn, closure, boundArgs] = await Promise.all([fnPromise, closurePromises, argsPromises]);
+      return (...args: any[]) =>
+        fn(...closure)(...boundArgs, ...args);
     }
+    if (isSolenoidSignal(value)) {
+      const signalObj = value;
+      return await signalStore.awaitGet(signalObj.id);
+    }
+
 
     const patchPromises = Object.entries(value).map(async ([key, val]) => {
       const patch = await hydrateJSON(val);
@@ -59,21 +54,19 @@ export const JSON_PARSE = async (value: string) => {
 }
 
 
-export function createSignal<T>(id: string, initialValue: T): SolenoidSignal<T> {
-  const s = signal(initialValue);
-
-  return solenize(s, {__type: SOLENOID_OBJECT_TYPES.Signal, id});
+export function createSignal<T>(id: string, initialValue: T): Signal<T> {
+  return signal(initialValue);
 }
 
 
 class SignalStore {
-  store = new Map<string, SolenoidSignal<any>>();
+  store = new Map<string, Signal<any>>();
   resolvers = new Map<string, ((value: any) => void)>();
 
   get(id: string) {
     return this.store.get(id);
   }
-  set(id: string, value: SolenoidSignal<any>) {
+  set(id: string, value: Signal<any>) {
     return this.store.set(id, value)
   }
   delete(id: string) {
@@ -91,10 +84,10 @@ class SignalStore {
   entries() {
     return this.store.entries()
   }
-  forEach(callback: (value: SolenoidSignal<any>, key: string, map: Map<string, SolenoidSignal<any>>) => void) {
+  forEach(callback: (value: Signal<any>, key: string, map: Map<string, Signal<any>>) => void) {
     this.store.forEach(callback);
   }
-  async awaitGet(id: string): Promise<SolenoidSignal<any>> {
+  async awaitGet(id: string): Promise<Signal<any>> {
     const signal = this.store.get(id);
     if (signal == null) {
       const {promise, resolve, reject} = Promise.withResolvers()

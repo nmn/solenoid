@@ -1,4 +1,5 @@
-import { type Signal, createSignal, signalStore } from "./core";
+import { createSignal, signalStore } from "./core";
+import { type Signal } from "./utils/types";
 
 export class LetSignal<T> extends HTMLElement {
   static observedAttributes = ["name", "initial-value"];
