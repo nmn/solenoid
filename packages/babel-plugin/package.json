@@ -16,6 +16,7 @@
         "test": "vitest"
     },
     "dependencies": {
+        "@babel/generator": "^7.27.1",
         "@babel/helper-module-imports": "^7.27.1",
         "@babel/helper-plugin-utils": "^7.27.1",
         "@babel/traverse": "^7.27.1",

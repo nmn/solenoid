@@ -1,11 +1,9 @@
 {
   "PRAGMA": "$identifier",
 
-  "REPLACEMENT": "",
+  "REPLACEMENT": null,
 
   "CLOSURE_IDENTIFIER_PREFIX": "$c",
 
-  "PARAM_IDENTIFIER_PREFIX": "$p",
-
-  "HOISTED_FUNCTION_NAME_PREFIX": "$f"
+  "PARAM_IDENTIFIER_PREFIX": "$p"
 }

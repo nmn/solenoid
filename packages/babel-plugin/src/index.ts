@@ -2,11 +2,11 @@ import type {PluginObj, NodePath} from '@babel/core';
 import type { BabelAPI } from '@babel/helper-plugin-utils';
 import type {PluginOptions, PluginState} from './types';
 
+import babelGenerator from '@babel/generator';
 import * as babelTypes from '@babel/types';
 import { declare } from "@babel/helper-plugin-utils";
-import { ImportInjector } from '@babel/helper-module-imports';
 import { PRAGMA, REPLACEMENT } from './identifiers.json';
-import transformArrowFunction from './helpers/transformArrowFunction';
+import { getIsolatedArrowFunction } from './helpers/transformArrowFunction';
 import validatePragmaUse from './helpers/validatePragmaUse';
 import validateCallExpressionAndGetArrowFunction from './helpers/validateCallExpressionAndGetArrowFunction';
 
@@ -21,48 +21,47 @@ export default declare<
     visitor: {
       Program: {
         enter(programPath, state) {
-          const injector = new ImportInjector(programPath);
-
-          // TODO: Get module-level identifiers so injectTopLevel doesn't collide.
-          state.injectTopLevel = (arrowPath: NodePath<babelTypes.ArrowFunctionExpression>) => {
-            const {inject, replace, injectedFunctionName} = transformArrowFunction({arrowPath, state, programPath});
-
-            const injected = injector._insertStatementsAfter(inject);
-
-            if (!injected) {
-              throw programPath.buildCodeFrameError('Failed to compile');
-            }
-
-            return [replace, injectedFunctionName];
-          };
+          // TODO: Check if PRAGMA was imported from correct module
+          this.hasImportedCorrectlyFromModule = true;
         }
       },
 
       CallExpression(path: NodePath<babelTypes.CallExpression>, state) {
+        if (!this.hasImportedCorrectlyFromModule) {
+          return;
+        }
+
         const { callee } = path.node;
 
         if (!babelTypes.isIdentifier(callee, { name: PRAGMA })) {
           return; 
         }
 
-        const func = validateCallExpressionAndGetArrowFunction(path);
+        const arrowPath = validateCallExpressionAndGetArrowFunction(path);
 
-        const [replace, injectedFunctionName] = state.injectTopLevel(func);
+        const isolatedFunc = getIsolatedArrowFunction({arrowPath});
 
-        func.replaceExpressionWithStatements(replace);
+        if (REPLACEMENT != null) {
+          path.get('callee').replaceWith(babelTypes.identifier(REPLACEMENT));
+        }
 
-        path.get('callee').replaceWith(babelTypes.identifier(REPLACEMENT));
-
-        // const bindings = path.scope.getAllBindings();
-        // console.log('bindings', bindings);
+        console.log('isolatedFunc', convertFunctionNodeToParseableString(isolatedFunc));
       },
 
       Identifier(path: NodePath<babelTypes.Identifier>) {
+        if (!this.hasImportedCorrectlyFromModule) {
+          return;
+        }
+
         validatePragmaUse(path);
       }
     },
   };
 });
+
+function convertFunctionNodeToParseableString<T extends babelTypes.ArrowFunctionExpression>(node: T): string {
+  return babelGenerator(node, {minified: true, compact: true, comments: false}).code;
+}
 
 
 /*
@@ -70,16 +69,13 @@ In:
   ----------------------------------------------------------
   / other code /
 
-  const foo = $identifier((baz)=>{bar(); baz();};
+  const foo = $identifier((baz)=>{bar(); baz();});
   ----------------------------------------------------------
 
 Out:
   ----------------------------------------------------------
-  const $f1 = ($c1)=>($p1)=>{$c1(); $p1();}
-  Object.defineProperty($f1, ...otherStuff);
-
   / other code /
   
-  const foo = ($f1(baz));
+  const foo = Object.assign((baz)=>{bar(); baz();}, {...});
   ----------------------------------------------------------
  */

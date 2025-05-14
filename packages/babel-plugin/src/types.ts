@@ -11,15 +11,13 @@ declare module '@babel/helper-module-imports' {
 
 export type { ImportInjector };
 
-export type InjectTopLevelFunctionExpression = [babelTypes.FunctionDeclaration];
-
+// using arrays here in case we want to inject more
 export type ReplaceArrowFunctionExpression = [babelTypes.ExpressionStatement];
 
-export type InjectedFunctionName = string;
-
-export interface PluginState extends PluginPass {
-  injectTopLevel(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): [ReplaceArrowFunctionExpression, InjectedFunctionName];
+export type PluginState = {
+  // If the PRAGMA was imported from the correct module, otherwise it's just a normal variable and we ignore it
+  hasImportedPragmaCorrectlyFromModule: boolean;
   counter: number;
-}
+} & PluginPass;
 
-export interface PluginOptions {}
+export type PluginOptions = {};

@@ -3,7 +3,7 @@ import type { NodePath } from '@babel/core';
 import * as babelTypes from '@babel/types';
 import { PRAGMA } from '../identifiers.json';
 
-type Identifiers = string[];
+type Identifiers = Set<string>;
 
 type Result = {
   params: Identifiers,
@@ -11,14 +11,14 @@ type Result = {
 };
 
 export default function getClosuresAndParams(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): Result {
-  const paramsSet = getParams(arrowPath);
-  const closuresSet = getClosures(arrowPath, paramsSet);
+  const params = getParams(arrowPath);
+  const closures = getClosures(arrowPath, params);
 
-  closuresSet.delete(PRAGMA); // this will be transformed by babel, don't include it as a closure
+  closures.delete(PRAGMA); // this will be transformed by babel, don't include it as a closure
   
   return {
-    params: Array.from(paramsSet),
-    closures: Array.from(closuresSet),
+    params,
+    closures,
   };
 }
 
