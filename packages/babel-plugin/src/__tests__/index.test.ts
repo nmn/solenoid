@@ -15,8 +15,6 @@ describe('Babel Plugin', ()=>{
     `;
     const [output, createFn] = transform<()=>-151>(fn);
 
-    console.log('output', output);
-
     const fnAfterCompilation = createFn();
 
     expect(fnAfterCompilation()).toBe(-151);
@@ -49,5 +47,8 @@ function transform<T>(code: string): [
 
   const output = (res as NonNullable<typeof res>).code as string;
 
-  return [output, ()=>eval(output)];
+  return [output, ()=>eval(/* js */`
+    const ${PRAGMA} = (fn)=>fn; // we'll later change this to an import from solenoid 
+    ${output}
+  `)];
 }
