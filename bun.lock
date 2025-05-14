@@ -21,8 +21,6 @@
         "@babel/generator": "^7.27.1",
         "@babel/helper-module-imports": "^7.27.1",
         "@babel/helper-plugin-utils": "^7.27.1",
-        "@babel/traverse": "^7.27.1",
-        "@types/babel__helper-module-imports": "^7.18.3",
       },
       "devDependencies": {
         "@babel/core": "^7.27.1",
@@ -206,8 +204,6 @@
     "@types/babel__core": ["@types/babel__core@7.20.5", "", { "dependencies": { "@babel/parser": "^7.20.7", "@babel/types": "^7.20.7", "@types/babel__generator": "*", "@types/babel__template": "*", "@types/babel__traverse": "*" } }, "sha512-qoQprZvz5wQFJwMDqeseRXWv3rqMvhgpbXFfVyWhbx9X47POIA6i/+dXefEmZKoAgOaTdaIgNSMqMIU61yRyzA=="],
 
     "@types/babel__generator": ["@types/babel__generator@7.27.0", "", { "dependencies": { "@babel/types": "^7.0.0" } }, "sha512-ufFd2Xi92OAVPYsy+P4n7/U7e68fex0+Ee8gSG9KX7eo084CWiQ4sdxktvdl0bOPupXtVJPY19zk6EwWqUQ8lg=="],
-
-    "@types/babel__helper-module-imports": ["@types/babel__helper-module-imports@7.18.3", "", { "dependencies": { "@types/babel__core": "*", "@types/babel__traverse": "*" } }, "sha512-2pyr9Vlriessj2KI85SEF7qma8vA3vzquQMw3wn6kL5lsfjH/YxJ1Noytk4/FJElpYybUbyaC37CVfEgfyme9A=="],
 
     "@types/babel__helper-plugin-utils": ["@types/babel__helper-plugin-utils@7.10.3", "", { "dependencies": { "@types/babel__core": "*" } }, "sha512-FcLBBPXInqKfULB2nvOBskQPcnSMZ0s1Y2q76u9H1NPPWaLcTeq38xBeKfF/RBUECK333qeaqRdYoPSwW7rTNQ=="],
 

@@ -1,6 +1,6 @@
 import type {NodePath} from '@babel/core';
 
-import * as babelTypes from '@babel/types';
+import {types as babelTypes} from '@babel/core';
 import { PRAGMA } from '../identifiers.json';
 
 export default function validateCallExpressionAndGetArrowFunction(path: NodePath<babelTypes.CallExpression>): NodePath<babelTypes.ArrowFunctionExpression> {

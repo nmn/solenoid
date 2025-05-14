@@ -2,8 +2,8 @@ import type {PluginObj, NodePath} from '@babel/core';
 import type { BabelAPI } from '@babel/helper-plugin-utils';
 import type {PluginOptions, PluginState} from './types';
 
-import babelGenerator from '@babel/generator';
-import * as babelTypes from '@babel/types';
+import { generate as babelGenerate } from '@babel/generator';
+import { types as babelTypes } from '@babel/core';
 import { declare } from "@babel/helper-plugin-utils";
 import { PRAGMA, REPLACEMENT } from './identifiers.json';
 import { getIsolatedArrowFunction } from './helpers/transformArrowFunction';
@@ -45,7 +45,9 @@ export default declare<
           path.get('callee').replaceWith(babelTypes.identifier(REPLACEMENT));
         }
 
-        console.log('isolatedFunc', convertFunctionNodeToParseableString(isolatedFunc));
+        const str = convertFunctionNodeToParseableString(isolatedFunc);
+
+        // TODO: hash string, inject string, place into the parameters of an Object.assign
       },
 
       Identifier(path: NodePath<babelTypes.Identifier>) {
@@ -60,7 +62,7 @@ export default declare<
 });
 
 function convertFunctionNodeToParseableString<T extends babelTypes.ArrowFunctionExpression>(node: T): string {
-  return babelGenerator(node, {minified: true, compact: true, comments: false}).code;
+  return babelGenerate(node, {compact: true, comments: false}).code;
 }
 
 

@@ -1,6 +1,6 @@
 import type { NodePath } from '@babel/core';
 
-import * as babelTypes from '@babel/types';
+import {types as babelTypes} from '@babel/core';
 import { PRAGMA } from '../identifiers.json';
 
 type Identifiers = Set<string>;
