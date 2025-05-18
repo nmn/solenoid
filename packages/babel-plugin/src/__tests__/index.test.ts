@@ -39,7 +39,7 @@ function transform<T>(code: string): [
   NonNullable<BabelFileResult['code']>,
   ()=>T
 ] {
-  const res = babel.transformSync(code as string, {
+  const res = babel.transformSync(code, {
     plugins: [plugin],
     configFile: false,
     babelrc: false,

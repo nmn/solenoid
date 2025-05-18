@@ -1,6 +1,0 @@
-{
-  "recommendations": [
-    // This is just so you can get syntax highlighting for the js strings used in the babel plugin tests
-    "Tobermory.es6-string-html"
-  ]
-}
