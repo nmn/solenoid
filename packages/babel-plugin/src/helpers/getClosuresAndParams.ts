@@ -1,7 +1,6 @@
 import type { NodePath } from '@babel/core';
 
-import {types as babelTypes} from '@babel/core';
-import { PRAGMA } from '../identifiers.json';
+import { types as babelTypes } from '@babel/core';
 
 type Identifiers = Set<string>;
 
@@ -13,12 +12,10 @@ type Result = {
 export default function getClosuresAndParams(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): Result {
   const params = getParams(arrowPath);
   const closures = getClosures(arrowPath, params);
-
-  closures.delete(PRAGMA); // this will be transformed by babel, don't include it as a closure
   
   return {
-    params,
     closures,
+    params,
   };
 }
 

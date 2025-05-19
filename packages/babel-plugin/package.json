@@ -1,32 +1,35 @@
 {
-    "name": "@solenoid/babel-plugin",
-    "type": "module",
-    "version": "0.0.0",
-    "description": "Babel plugin for Solenoid",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/nmn/solenoid.git",
-        "directory": "packages/babel-plugin"
-    },
-    "license": "MIT",
-    "scripts": {
-        "build": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
-        "test": "vitest"
-    },
-    "dependencies": {
-        "@babel/generator": "^7.27.1",
-        "@babel/helper-plugin-utils": "^7.27.1"
-    },
-    "peerDependencies": {
-        "@babel/core": "^7.27.1"
-    },
-    "devDependencies": {
-        "@babel/core": "^7.27.1"
-    },
-    "keywords": [
-        "babel-plugin",
-        "solenoid"
-    ]
+  "name": "@solenoid/babel-plugin",
+  "type": "module",
+  "version": "0.0.0",
+  "description": "Babel plugin for Solenoid",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nmn/solenoid.git",
+    "directory": "packages/babel-plugin"
+  },
+  "license": "MIT",
+  "scripts": {
+    "build": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@babel/generator": "^7.27.1",
+    "@babel/helper-plugin-utils": "^7.27.1"
+  },
+  "peerDependencies": {
+    "@babel/core": "^7.27.1",
+    "@solenoid/custom-elements": "^0.0.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.27.1",
+    "@babel/preset-typescript": "^7.27.1",
+    "@solenoid/custom-elements": "^0.0.0"
+  },
+  "keywords": [
+    "babel-plugin",
+    "solenoid"
+  ]
 }

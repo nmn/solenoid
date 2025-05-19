@@ -4,9 +4,7 @@ import type { PluginPass } from '@babel/core';
 // using tuples here in case we want to inject more
 export type ReplaceArrowFunctionExpression = [babelTypes.ExpressionStatement];
 
-export type PluginState = {
-  // If the PRAGMA was imported from solenoid, otherwise it's just a normal variable and we ignore it
-  hasImportedPragmaCorrectlyFromModule: boolean;
-} & PluginPass;
+export type PluginState = PluginPass;
 
-export type PluginOptions = {};
+export type PluginOptions = Record<never, never>;
+
