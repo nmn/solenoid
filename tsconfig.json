@@ -1,8 +1,9 @@
 {
+	"extends": "@tsconfig/bun/tsconfig.json",
 	"compilerOptions": {
+		"noEmit": true,
 		"paths": {
 			"@solenoid/custom-elements/dist/*": ["./packages/custom-elements/src/*"]
-		},
-		"resolveJsonModule": true
+		}
 	}
 }

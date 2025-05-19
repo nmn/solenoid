@@ -1,17 +1,19 @@
 {
 	"name": "solenoid",
 	"private": true,
-	"devDependencies": {
-		"@biomejs/biome": "^1.9.4",
-		"@types/bun": "^1.2.3",
-		"typescript": "^5.7.3",
-		"vitest": "^3.0.6",
-		"vite-tsconfig-paths": "^5.1.4"
-	},
+	"workspaces": ["tools/*", "packages/*"],
 	"scripts": {
 		"build": "bun run --filter '*' build",
+		"format": "biome format --write .",
 		"test": "bun run --filter '*' test",
-		"format": "biome format --write ."
+		"typecheck": "tsc"
 	},
-	"workspaces": ["tools/*", "packages/*"]
+	"devDependencies": {
+		"@biomejs/biome": "^1.9.4",
+		"@tsconfig/bun": "^1.0.7",
+		"@types/bun": "^1.2.3",
+		"typescript": "^5.7.3",
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^3.0.6"
+	}
 }
