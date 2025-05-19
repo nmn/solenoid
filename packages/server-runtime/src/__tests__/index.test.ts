@@ -1,3 +1,4 @@
+import { isSolenoidFunction } from "@solenoid/custom-elements/dist/utils/types";
 import { describe, expect, test } from "vitest";
 import { serializableFn } from "..";
 
@@ -26,6 +27,14 @@ describe('server-runtime', ()=>{
         closure: (): []=>[],
         id: '',
       })(stringParam).str).toBe(stringParam);
+    });
+
+
+    test('result evaluates correctly to a solenoid function', ()=>{
+      const fn = serializableFn({fn: ()=>()=>null, closure: (): []=>[], id: ''});
+
+      // This is broken since currently we only do typeof var === 'object'
+      expect(isSolenoidFunction(fn)).toBe(true);
     });
   });
 });

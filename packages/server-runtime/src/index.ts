@@ -21,7 +21,7 @@ export function serializableFn<T extends SerializableFn>({fn, closure, id}: Seri
     [SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function,
     closure,
     id,
-    module: JSON.stringify(fn),
+    module: fn.toString(),
   };
 
   return Object.assign(fnWithClosuresFilled, config);
