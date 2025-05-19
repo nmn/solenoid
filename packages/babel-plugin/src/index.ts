@@ -1,4 +1,4 @@
-import type { PluginObj, NodePath, PluginOptions } from "@babel/core";
+import type { PluginObj, NodePath } from "@babel/core";
 import type { BabelAPI } from "@babel/helper-plugin-utils";
 
 import { types as t } from "@babel/core";
@@ -8,8 +8,11 @@ import { getIsolatedArrowFunctionAndVars } from "./helpers/transformArrowFunctio
 import generate from "@babel/generator";
 import murmurhash from "murmurhash";
 
+// We don't have plugin options at the moment.
+export type PluginOptions = Record<never,never>;
+
 export default declare(
-	(api: BabelAPI, _options: PluginOptions, _dirname: string): PluginObj => {
+	(api: BabelAPI, _options: PluginOptions): PluginObj => {
 		api.assertVersion(7);
 
 		let fnHelperId: t.Identifier;
@@ -42,7 +45,7 @@ export default declare(
 					},
 				},
 				ArrowFunctionExpression: {
-					enter(arrowPath: NodePath<t.ArrowFunctionExpression>, state) {
+					enter(arrowPath: NodePath<t.ArrowFunctionExpression>) {
 						let fnName = null;
 						if (
 							arrowPath.parentPath.isVariableDeclarator() &&

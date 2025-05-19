@@ -1,7 +1,6 @@
 import type { NodePath } from "@babel/core";
 
 import { traverse, types as t } from "@babel/core";
-import { generate as babelGenerate } from "@babel/generator";
 import getClosuresAndParams from "./getClosuresAndParams";
 
 export type Output = {
