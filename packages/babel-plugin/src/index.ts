@@ -7,6 +7,8 @@ import { declare } from "@babel/helper-plugin-utils";
 import createConfigAssignmentStatement from './helpers/createConfigAssignmentStatement';
 import {  convertFunctionNodeToParseableString, getIsolatedArrowFunctionAndVars } from './helpers/transformArrowFunction';
 
+export type { PluginOptions };
+
 export default declare<
   PluginOptions, 
   PluginObj<PluginState>

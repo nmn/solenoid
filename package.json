@@ -5,7 +5,8 @@
     "@biomejs/biome": "^1.9.4",
     "@types/bun": "^1.2.3",
     "typescript": "^5.7.3",
-    "vitest": "^3.0.6"
+    "vitest": "^3.0.6",
+    "vite-tsconfig-paths": "^5.1.4"
   },
   "scripts": {
     "build": "bun run --filter '*' build",
