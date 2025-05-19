@@ -1,6 +1,6 @@
 import type { NodePath } from '@babel/core';
 
-import { types as babelTypes } from '@babel/core';
+import { types as t } from '@babel/core';
 
 type Identifiers = Set<string>;
 
@@ -9,17 +9,20 @@ type Result = {
   closures: Identifiers,
 };
 
-export default function getClosuresAndParams(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): Result {
+export default function getClosuresAndParams(
+  arrowPath: NodePath<t.ArrowFunctionExpression>,
+  ignoredNames: string[]
+): Result {
   const params = getParams(arrowPath);
-  const closures = getClosures(arrowPath, params);
-  
+  const closures = getClosures(arrowPath, params, ignoredNames);
+
   return {
     closures,
     params,
   };
 }
 
-function getParams(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): Set<string> {
+function getParams(arrowPath: NodePath<t.ArrowFunctionExpression>): Set<string> {
   const set = new Set<string>(Object.entries(arrowPath.scope.bindings)
     .filter(([, binding]) => binding.kind === 'param')
     .map(([name]) => name))
@@ -27,12 +30,12 @@ function getParams(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): Set
   return set;
 }
 
-function getClosures(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>, paramsSet: Set<string>): Set<string> {
+function getClosures(arrowPath: NodePath<t.ArrowFunctionExpression>, paramsSet: Set<string>, ignoredNames: string[]): Set<string> {
   const set = new Set<string>();
 
   arrowPath.get('body').traverse({
     Identifier(identifierPath) {
-      if (!isClosureIdentifier(arrowPath, paramsSet, identifierPath)) {
+      if (!isClosureIdentifier(arrowPath, paramsSet, identifierPath, ignoredNames)) {
         return;
       }
 
@@ -43,12 +46,24 @@ function getClosures(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>, pa
   return set;
 }
 
-function isClosureIdentifier(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>, paramsSet: Set<string>, path: NodePath<babelTypes.Identifier>): boolean {
+function isClosureIdentifier(arrowPath: NodePath<t.ArrowFunctionExpression>, paramsSet: Set<string>, path: NodePath<t.Identifier>, ignoredNames: string[]): boolean {
   const name = path.node.name;
 
+  if (ignoredNames.includes(name)) {
+    return false;
+  }
+
+  // Ignore identifiers used as object key lookup
   if (
     path.parent.type === 'MemberExpression' &&
     path.parent.property === path.node &&
+    !path.parent.computed
+  ) {
+    return false;
+  }
+
+  if (
+    t.isObjectProperty(path.parent) &&
     !path.parent.computed
   ) {
     return false;

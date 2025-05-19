@@ -16,8 +16,7 @@ export enum SOLENOID_OBJECT_TYPES {
 export type SolenoidFunctionConfig = {
   [SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function,
   module: string,
-  closure: unknown[],
-  args: unknown[]
+  closure: unknown[]
 }
 
 export type SolenoidSignalConfig = {

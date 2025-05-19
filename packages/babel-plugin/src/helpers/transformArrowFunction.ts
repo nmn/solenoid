@@ -8,13 +8,16 @@ import {PARAM_IDENTIFIER_PREFIX} from '../identifiers.json';
 export type Output = {
   isolatedFunction: babelTypes.ArrowFunctionExpression,
   vars: {
-    closures: readonly babelTypes.Identifier[],
-    params: readonly babelTypes.Identifier[],
+    closures: babelTypes.Identifier[],
+    params: babelTypes.Identifier[],
   }
 };
 
-export function getIsolatedArrowFunctionAndVars(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>): Output {
-  const { closures, params } = getClosuresAndParams(arrowPath);
+export function getIsolatedArrowFunctionAndVars(
+  arrowPath: NodePath<babelTypes.ArrowFunctionExpression>,
+  ignoredNames: string[]
+): Output {
+  const { closures, params } = getClosuresAndParams(arrowPath, ignoredNames);
 
   const clonedNode = babelTypes.cloneNode(arrowPath.node, true, true);
   clonedNode.params.unshift(...Array.from(closures).map((str)=>babelTypes.identifier(str)));
@@ -23,24 +26,19 @@ export function getIsolatedArrowFunctionAndVars(arrowPath: NodePath<babelTypes.A
 
   const newBindingNames = Object.keys(fakePath.scope.bindings);
   let i = 0;
-  newBindingNames.forEach((bindingName)=>{
+  for (const bindingName of newBindingNames) {
     fakePath.scope.rename(bindingName, `${PARAM_IDENTIFIER_PREFIX}${i}`);
     i++;
-  });
+  }
 
   return {
     isolatedFunction: fakePath.node,
     vars: {
       closures: Array.from(closures).map((str)=>babelTypes.identifier(str)),
-      params: Array.from(params).map((str)=>babelTypes.identifier(str)), 
+      params: Array.from(params).map((str)=>babelTypes.identifier(str)),
     }
   };
 }
-
-export function convertFunctionNodeToParseableString<T extends babelTypes.ArrowFunctionExpression>(node: T): string {
-  return babelGenerate(node, {compact: true, comments: false}).code;
-}
-
 
 function createFakePath<T extends babelTypes.Expression>(target: T): NodePath<T> {
   let result: NodePath<T> | null = null;

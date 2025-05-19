@@ -1,53 +1,92 @@
-import type { PluginObj, NodePath } from '@babel/core';
+import type { PluginObj, NodePath, PluginOptions } from '@babel/core';
 import type { BabelAPI } from '@babel/helper-plugin-utils';
-import type { PluginOptions, PluginState } from './types';
 
-import { types as babelTypes } from '@babel/core';
+import { types as t } from '@babel/core';
 import { declare } from "@babel/helper-plugin-utils";
-import createConfigAssignmentStatement from './helpers/createConfigAssignmentStatement';
-import {  convertFunctionNodeToParseableString, getIsolatedArrowFunctionAndVars } from './helpers/transformArrowFunction';
+import { addNamed } from "@babel/helper-module-imports";
+import {  getIsolatedArrowFunctionAndVars } from './helpers/transformArrowFunction';
+import generate from '@babel/generator';
+// @ts-ignore
+import murmurhash from 'murmurhash';
 
-export type { PluginOptions };
 
-export default declare<
-  PluginOptions, 
-  PluginObj<PluginState>
->((api: BabelAPI, _options: PluginOptions, _dirname: string): PluginObj<PluginState> => {
+export default declare((api: BabelAPI, _options: PluginOptions, _dirname: string): PluginObj => {
   api.assertVersion(7);
+
+  let fnHelperId: t.Identifier
+  let globalName: t.Identifier
+  const fns: Record<string, t.ArrowFunctionExpression> = {};
 
   return {
     visitor: {
-      ArrowFunctionExpression:{
-        exit(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>, state) {
-          const { isolatedFunction, vars: { closures, params } } = getIsolatedArrowFunctionAndVars(arrowPath);
-          const stringified = convertFunctionNodeToParseableString(isolatedFunction);
+      Program: {
+        enter(path: NodePath<t.Program>) {
+          fnHelperId = addNamed(path, 'serializableFn', '@solenoid/server-runtime');
+          globalName = addNamed(path, 'globalName', '@solenoid/server-runtime');
+        },
+        exit(path: NodePath<t.Program>) {
+          for (const [name, value] of Object.entries(fns)) {
+            path.node.body.unshift(
+              t.variableDeclaration('const', [
+                t.variableDeclarator(
+                  t.identifier(name),
+                  value
+                )
+              ])
+            );
+          }
+        }
+      },
+      ArrowFunctionExpression: {
+        enter(arrowPath: NodePath<t.ArrowFunctionExpression>, state) {
+          const { isolatedFunction, vars: { closures } } = getIsolatedArrowFunctionAndVars(arrowPath, [
+            fnHelperId.name,
+            globalName.name
+          ]);
 
-          arrowPath.replaceWith(
-            createConfigAssignmentStatement(
-              arrowPath.node,
-              { module: stringified },
-              { args: params, closure: closures },
-            ),
+          const fnString = generate(isolatedFunction).code;
+          const fnHash = murmurhash.v3(fnString);
+          const fnId = `_${fnHash.toString(36)}`;
+          const fnIdentifier = t.identifier(fnId);
+
+          fns[fnId] = isolatedFunction;
+
+          const replacement = t.objectExpression([
+            t.objectProperty(t.identifier('fn'), fnIdentifier),
+            t.objectProperty(t.identifier('closure'), t.arrayExpression(closures)),
+            t.objectProperty(t.identifier('id'), t.stringLiteral(`_${fnHash.toString(36)}`)),
+          ]);
+
+          const withCallExpression = t.callExpression(
+            fnHelperId,
+            [replacement]
           );
+
+          arrowPath.replaceWith( withCallExpression );
+
+          const callExpressionReplacement = arrowPath as unknown as NodePath<t.CallExpression>;
+          const object = callExpressionReplacement.get('arguments')[0] as NodePath<t.ObjectExpression>;
+          const closure = object.get('properties')
+              .find(propPath => propPath.isProperty() && propPath.get('key').isIdentifier({ name: 'closure' }));
+          if (closure != null) {
+            const valueArray = closure.get('value') as NodePath<t.ArrayExpression>;
+            for (const closureVal of valueArray.get('elements')) {
+              if (closureVal.isIdentifier()) {
+                if (closureVal.scope.hasGlobal(closureVal.node.name)) {
+                  closureVal.replaceWith(
+                    t.callExpression(
+                      globalName,
+                      [t.stringLiteral(closureVal.node.name)]
+                    )
+                  )
+                }
+              }
+            }
+          }
+
+          arrowPath.skip();
         },
       },
     }
   };
 });
-
-
-/*
-In:
-  ----------------------------------------------------------
-  / other code /
-
-  const foo = $identifier((baz)=>{bar(); baz();});
-  ----------------------------------------------------------
-
-Out:
-  ----------------------------------------------------------
-  / other code /
-  
-  const foo = Object.assign((baz)=>{bar(); baz();}, {...});
-  ----------------------------------------------------------
- */
