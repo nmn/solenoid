@@ -4,9 +4,9 @@ declare const SOLENOID_CUSTOM_KEY_SYMBOL: unique symbol;
 
 type T_SOLENOID_SYMBOL = typeof SOLENOID_CUSTOM_KEY_SYMBOL;
 
-const SOLENOID_CUSTOM_KEY: T_SOLENOID_SYMBOL = '__type' as any;
+export const SOLENOID_CUSTOM_KEY: T_SOLENOID_SYMBOL = '__type' as any;
 
-enum SOLENOID_OBJECT_TYPES {
+export enum SOLENOID_OBJECT_TYPES {
   Function = "$$FUNCTION",
   Signal = "$$SIGNAL",
 };
