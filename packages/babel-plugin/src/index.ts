@@ -6,7 +6,6 @@ import { declare } from "@babel/helper-plugin-utils";
 import { addNamed } from "@babel/helper-module-imports";
 import { getIsolatedArrowFunctionAndVars } from "./helpers/transformArrowFunction";
 import generate from "@babel/generator";
-// @ts-ignore
 import murmurhash from "murmurhash";
 
 export default declare(
