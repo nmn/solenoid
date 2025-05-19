@@ -15,16 +15,14 @@ type SerializableFnConf<F extends SerializableFn> = {
 
 export function serializableFn<T extends SerializableFn>({fn, closure, id}: SerializableFnConf<T>): ArrowOf<T> & SolenoidFunctionConfig<ClosureOf<T>> {
   const closureVars = closure();
-  const fnWithClosuresFilled = fn(...closureVars);
+  const fnWithClosuresFilled = fn(...closureVars) as ArrowOf<typeof fn>;
 
-  const config = {
+  const config: SolenoidFunctionConfig<typeof closureVars> = {
     [SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function,
     closure,
     id,
     module: JSON.stringify(fn),
   };
 
-  Object.assign(fnWithClosuresFilled, config);
-
-  return fnWithClosuresFilled as ArrowOf<typeof fn> & SolenoidFunctionConfig<typeof closureVars>;
+  return Object.assign(fnWithClosuresFilled, config);
 }
