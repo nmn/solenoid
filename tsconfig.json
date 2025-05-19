@@ -1,8 +1,8 @@
 {
-  "compilerOptions": {
-    "paths": {
-      "@solenoid/custom-elements/dist/*": ["./packages/custom-elements/src/*"],
-    },
-    "resolveJsonModule": true
-  }
+	"compilerOptions": {
+		"paths": {
+			"@solenoid/custom-elements/dist/*": ["./packages/custom-elements/src/*"]
+		},
+		"resolveJsonModule": true
+	}
 }

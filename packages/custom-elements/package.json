@@ -1,18 +1,18 @@
 {
-    "name": "@solenoid/custom-elements",
-    "version": "0.0.0",
-    "description": "Custom elements for Solenoid",
-    "main": "lib/index.js",
-    "types": "lib/index.d.ts",
-    "repository": "https://github.com/nmn/solenoid",
-    "license": "MIT",
-    "scripts": {
-        "watch": "bun build --outfile=lib/index.js ./src/index.ts --watch",
-        "build": "bun build --minify --production --target=browser --outfile=lib/index.js ./src/index.ts"
-    },
-    "dependencies": {
-        "alien-signals": "^2.0.4",
-        "lodash.debounce": "^4.0.8"
-    },
-    "devDependencies": {}
+	"name": "@solenoid/custom-elements",
+	"version": "0.0.0",
+	"description": "Custom elements for Solenoid",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"repository": "https://github.com/nmn/solenoid",
+	"license": "MIT",
+	"scripts": {
+		"watch": "bun build --outfile=lib/index.js ./src/index.ts --watch",
+		"build": "bun build --minify --production --target=browser --outfile=lib/index.js ./src/index.ts"
+	},
+	"dependencies": {
+		"alien-signals": "^2.0.4",
+		"lodash.debounce": "^4.0.8"
+	},
+	"devDependencies": {}
 }
