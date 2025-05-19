@@ -30,12 +30,16 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _10eff6n = ($p0, $p1) => $p1 + $p0;
+      const _1jtluhg = $$closure => {
+        const [$c0] = $$closure();
+        const $r = a => a + $c0;
+        return $r;
+      };
       const N = 1;
       const addN = _serializableFn({
-        fn: _10eff6n,
-        closure: [N],
-        id: "_10eff6n"
+        fn: _1jtluhg,
+        closure: () => [N],
+        id: "_1jtluhg"
       });"
     `)
   });
@@ -50,18 +54,26 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _5e4vi8 = ($p0, $p1, $p2) => $p0($p2, $p1);
-      const _10eff6n = ($p0, $p1) => $p1 + $p0;
+      const _1g61rwf = $$closure => {
+        const [$c0, $c1] = $$closure();
+        const $r = a => $c0(a, $c1);
+        return $r;
+      };
+      const _1jtluhg = $$closure => {
+        const [$c0] = $$closure();
+        const $r = a => a + $c0;
+        return $r;
+      };
       const N = 10;
       const addN = _serializableFn({
-        fn: _10eff6n,
-        closure: [N],
-        id: "_10eff6n"
+        fn: _1jtluhg,
+        closure: () => [N],
+        id: "_1jtluhg"
       });
       const useAddN = _serializableFn({
-        fn: _5e4vi8,
-        closure: [addN, N],
-        id: "_5e4vi8"
+        fn: _1g61rwf,
+        closure: () => [addN, N],
+        id: "_1g61rwf"
       });"
     `)
   });
@@ -86,19 +98,27 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _1dgft2j = $p0 => $p0($p0() - 1);
-      const _1whaks8 = $p0 => $p0($p0() + 1);
+      const _db4zf6 = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0($c0() - 1);
+        return $r;
+      };
+      const _hxdr80 = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0($c0() + 1);
+        return $r;
+      };
       function MyComponent() {
         const count = signal(0);
         const increment = _serializableFn({
-          fn: _1whaks8,
-          closure: [count],
-          id: "_1whaks8"
+          fn: _hxdr80,
+          closure: () => [count],
+          id: "_hxdr80"
         });
         const decrement = _serializableFn({
-          fn: _1dgft2j,
-          closure: [count],
-          id: "_1dgft2j"
+          fn: _db4zf6,
+          closure: () => [count],
+          id: "_db4zf6"
         });
         return <div>
                   <button onClick={decrement}>-</button>
@@ -135,25 +155,33 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _1jl7q9a = ($p0, $p1) => {
-        $p1.preventDefault();
-        $p0($p0() - 1);
+      const _1xwtz1r = $$closure => {
+        const [$c0] = $$closure();
+        const $r = event => {
+          event.preventDefault();
+          $c0($c0() - 1);
+        };
+        return $r;
       };
-      const _1i0w8l1 = ($p0, $p1) => {
-        $p1.preventDefault();
-        $p0($p0() + 1);
+      const _bgh3uu = $$closure => {
+        const [$c0] = $$closure();
+        const $r = event => {
+          event.preventDefault();
+          $c0($c0() + 1);
+        };
+        return $r;
       };
       function MyComponent() {
         const count = signal(0);
         const increment = _serializableFn({
-          fn: _1i0w8l1,
-          closure: [count],
-          id: "_1i0w8l1"
+          fn: _bgh3uu,
+          closure: () => [count],
+          id: "_bgh3uu"
         });
         const decrement = _serializableFn({
-          fn: _1jl7q9a,
-          closure: [count],
-          id: "_1jl7q9a"
+          fn: _1xwtz1r,
+          closure: () => [count],
+          id: "_1xwtz1r"
         });
         return <div>
                   <button onClick={decrement}>-</button>
@@ -194,28 +222,36 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _1f6dm1b = ($p0, $p1) => {
-        const $p2 = () => {
-          $p0($p0() + 1);
+      const _1u6a343 = $$closure => {
+        const [$c0] = $$closure();
+        const $r = event => {
+          const increment = () => {
+            $c0($c0() + 1);
+          };
+          event.preventDefault();
+          increment();
         };
-        $p1.preventDefault();
-        $p2();
+        return $r;
       };
-      const _1jl7q9a = ($p0, $p1) => {
-        $p1.preventDefault();
-        $p0($p0() - 1);
+      const _1xwtz1r = $$closure => {
+        const [$c0] = $$closure();
+        const $r = event => {
+          event.preventDefault();
+          $c0($c0() - 1);
+        };
+        return $r;
       };
       function MyComponent() {
         const count = signal(0);
         const decrement = _serializableFn({
-          fn: _1jl7q9a,
-          closure: [count],
-          id: "_1jl7q9a"
+          fn: _1xwtz1r,
+          closure: () => [count],
+          id: "_1xwtz1r"
         });
         const onIncrementClick = _serializableFn({
-          fn: _1f6dm1b,
-          closure: [count],
-          id: "_1f6dm1b"
+          fn: _1u6a343,
+          closure: () => [count],
+          id: "_1u6a343"
         });
         return <div>
                   <button onClick={decrement}>-</button>
@@ -237,12 +273,16 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _f6dq2x = $p0 => $p0.innerWidth;
+      const _14981cm = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0.innerWidth;
+        return $r;
+      };
       function MyComponent() {
         const innerWidth = signal(_serializableFn({
-          fn: _f6dq2x,
-          closure: [_globalName("window")],
-          id: "_f6dq2x"
+          fn: _14981cm,
+          closure: () => [_globalName("window")],
+          id: "_14981cm"
         }));
       }"
     `);
@@ -268,22 +308,26 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _sn5d5g = ($p0, $p1) => {
-        const $p2 = () => {
-          $p0($p1.innerWidth);
+      const _1lnmtat = $$closure => {
+        const [$c0, $c1] = $$closure();
+        const $r = () => {
+          const onResize = () => {
+            $c0($c1.innerWidth);
+          };
+          onResize();
+          $c1.addEventListener('resize', onResize);
+          return () => {
+            $c1.removeEventListener('resize', onResize);
+          };
         };
-        $p2();
-        $p1.addEventListener('resize', $p2);
-        return () => {
-          $p1.removeEventListener('resize', $p2);
-        };
+        return $r;
       };
       function MyComponent() {
         const innerWidth = signal(760);
         effect(_serializableFn({
-          fn: _sn5d5g,
-          closure: [innerWidth, _globalName("window")],
-          id: "_sn5d5g"
+          fn: _1lnmtat,
+          closure: () => [innerWidth, _globalName("window")],
+          id: "_1lnmtat"
         }));
       }"
     `);
@@ -312,30 +356,38 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _7i5hid = ($p0, $p1, $p2) => {
-        const $p3 = () => {
-          $p0($p1.innerWidth);
+      const _1ofw1jn = $$closure => {
+        const [$c0, $c1] = $$closure();
+        const $r = el => {
+          const onResize = () => {
+            $c0($c1.innerWidth);
+          };
+          onResize();
+          el.addEventListener('resize', onResize);
+          return () => {
+            el.removeEventListener('resize', onResize);
+          };
         };
-        $p3();
-        $p2.addEventListener('resize', $p3);
-        return () => {
-          $p2.removeEventListener('resize', $p3);
-        };
+        return $r;
       };
-      const _1acckdb = ($p0, $p1) => {
-        $p0($p1.innerWidth);
+      const _1xdcgvu = $$closure => {
+        const [$c0, $c1] = $$closure();
+        const $r = () => {
+          $c0($c1.innerWidth);
+        };
+        return $r;
       };
       function MyComponent() {
         const innerWidth = signal(760);
         const onClick = _serializableFn({
-          fn: _1acckdb,
-          closure: [innerWidth, _globalName("window")],
-          id: "_1acckdb"
+          fn: _1xdcgvu,
+          closure: () => [innerWidth, _globalName("window")],
+          id: "_1xdcgvu"
         });
         effect(_serializableFn({
-          fn: _7i5hid,
-          closure: [innerWidth, _globalName("window")],
-          id: "_7i5hid"
+          fn: _1ofw1jn,
+          closure: () => [innerWidth, _globalName("window")],
+          id: "_1ofw1jn"
         }));
       }"
     `);
@@ -359,19 +411,23 @@ describe("Babel Plugin tests", async () => {
 
     expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
-      const _kexl8w = ($p0, $p1, $p2, $p3, $p4) => {
-        $p0($p1.innerWidth);
-        $p2.current = $p3(() => {
-          $p4();
-        }, 1000);
+      const _1vzf6mg = $$closure => {
+        const [$c0, $c1, $c2, $c3, $r] = $$closure();
+        const $r = () => {
+          $c0($c1.innerWidth);
+          $c2.current = $c3(() => {
+            $r();
+          }, 1000);
+        };
+        return $r;
       };
       function MyComponent() {
         const innerWidth = signal(760);
         const timeoutRef = ref(0);
         const onClick = _serializableFn({
-          fn: _kexl8w,
-          closure: [innerWidth, _globalName("window"), timeoutRef, _globalName("setTimeout"), onClick],
-          id: "_kexl8w"
+          fn: _1vzf6mg,
+          closure: () => [innerWidth, _globalName("window"), timeoutRef, _globalName("setTimeout"), onClick],
+          id: "_1vzf6mg"
         });
       }"
     `);

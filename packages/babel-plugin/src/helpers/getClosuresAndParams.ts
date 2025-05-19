@@ -2,11 +2,9 @@ import type { NodePath } from '@babel/core';
 
 import { types as t } from '@babel/core';
 
-type Identifiers = Set<string>;
-
 type Result = {
-  params: Identifiers,
-  closures: Identifiers,
+  params: Set<string>,
+  closures: Set<string>,
 };
 
 export default function getClosuresAndParams(

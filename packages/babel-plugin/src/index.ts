@@ -39,10 +39,15 @@ export default declare((api: BabelAPI, _options: PluginOptions, _dirname: string
       },
       ArrowFunctionExpression: {
         enter(arrowPath: NodePath<t.ArrowFunctionExpression>, state) {
+          let fnName = null;
+          if (arrowPath.parentPath.isVariableDeclarator() && arrowPath.parentPath.node.id.type === 'Identifier') {
+            fnName = arrowPath.parentPath.node.id.name;
+          }
+
           const { isolatedFunction, vars: { closures } } = getIsolatedArrowFunctionAndVars(arrowPath, [
             fnHelperId.name,
             globalName.name
-          ]);
+          ], fnName);
 
           const fnString = generate(isolatedFunction).code;
           const fnHash = murmurhash.v3(fnString);
@@ -53,7 +58,9 @@ export default declare((api: BabelAPI, _options: PluginOptions, _dirname: string
 
           const replacement = t.objectExpression([
             t.objectProperty(t.identifier('fn'), fnIdentifier),
-            t.objectProperty(t.identifier('closure'), t.arrayExpression(closures)),
+            t.objectProperty(t.identifier('closure'),
+              t.arrowFunctionExpression([], t.arrayExpression(closures))
+            ),
             t.objectProperty(t.identifier('id'), t.stringLiteral(`_${fnHash.toString(36)}`)),
           ]);
 
@@ -69,7 +76,8 @@ export default declare((api: BabelAPI, _options: PluginOptions, _dirname: string
           const closure = object.get('properties')
               .find(propPath => propPath.isProperty() && propPath.get('key').isIdentifier({ name: 'closure' }));
           if (closure != null) {
-            const valueArray = closure.get('value') as NodePath<t.ArrayExpression>;
+            const valueFn = closure.get('value') as NodePath<t.ArrowFunctionExpression>;
+            const valueArray = valueFn.get('body') as NodePath<t.ArrayExpression>;
             for (const closureVal of valueArray.get('elements')) {
               if (closureVal.isIdentifier()) {
                 if (closureVal.scope.hasGlobal(closureVal.node.name)) {
