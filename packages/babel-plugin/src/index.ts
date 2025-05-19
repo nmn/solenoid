@@ -15,19 +15,21 @@ export default declare<
 
   return {
     visitor: {
-      ArrowFunctionExpression(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>, state) {
-        const { isolatedFunction, vars: { closures, params } } = getIsolatedArrowFunctionAndVars(arrowPath);
-        const stringified = convertFunctionNodeToParseableString(isolatedFunction);
+      ArrowFunctionExpression:{
+        exit(arrowPath: NodePath<babelTypes.ArrowFunctionExpression>, state) {
+          const { isolatedFunction, vars: { closures, params } } = getIsolatedArrowFunctionAndVars(arrowPath);
+          const stringified = convertFunctionNodeToParseableString(isolatedFunction);
 
-        arrowPath.replaceWith(
-          createConfigAssignmentStatement(
-            arrowPath.node,
-            { module: stringified },
-            { args: params, closure: closures },
-          )
-        );
+          arrowPath.replaceWith(
+            createConfigAssignmentStatement(
+              arrowPath.node,
+              { module: stringified },
+              { args: params, closure: closures },
+            ),
+          );
+        },
       },
-    },
+    }
   };
 });
 
