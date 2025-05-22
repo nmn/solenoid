@@ -9,6 +9,7 @@ export const SOLENOID_CUSTOM_KEY: T_SOLENOID_SYMBOL = "__type" as any;
 export enum SOLENOID_OBJECT_TYPES {
 	Function = "$$FUNCTION",
 	Signal = "$$SIGNAL",
+	Global = "$$GLOBAL",
 }
 
 // ---------------------------------------------------
@@ -18,10 +19,16 @@ export type SolenoidFunctionConfig<Closure extends any[] = any[]> = {
 	id: string;
 	module: string;
 	closure: Closure;
+	toJSON: () => Record<string, any>;
 };
 
 export type SolenoidSignalConfig = {
 	[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Signal;
+	id: string;
+};
+
+export type SolenoidGlobalNameConfig = {
+	[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Global;
 	id: string;
 };
 
