@@ -18,6 +18,7 @@
 	"dependencies": {
 		"@babel/generator": "^7.27.1",
 		"@babel/helper-plugin-utils": "^7.27.1",
+		"@types/murmurhash": "^2.0.0",
 		"murmurhash": "^2.0.1"
 	},
 	"peerDependencies": {

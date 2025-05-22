@@ -1,5 +1,4 @@
 import { effect, effectScope } from "alien-signals";
-import debounce from "lodash.debounce";
 import { JSON_PARSE } from "./core";
 
 export class SignalText extends HTMLElement {
