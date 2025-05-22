@@ -1,5 +1,5 @@
 {
-	"name": "@solenoid/runtime",
+	"name": "@solenoid/server-runtime",
 	"version": "0.0.0",
 	"description": "Runtime for rendering on the server. TBD",
 	"main": "lib/index.js",
@@ -11,5 +11,10 @@
 		"test": "vitest"
 	},
 	"dependencies": {},
-	"devDependencies": {}
+	"peerDependencies": {
+		"@solenoid/custom-elements": "^0.0.0"
+	},
+	"devDependencies": {
+		"@solenoid/custom-elements": "^0.0.0"
+	}
 }

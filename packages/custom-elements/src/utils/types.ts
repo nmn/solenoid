@@ -13,10 +13,11 @@ export enum SOLENOID_OBJECT_TYPES {
 
 // ---------------------------------------------------
 
-export type SolenoidFunctionConfig = {
+export type SolenoidFunctionConfig<Closure extends any[] = any[]> = {
 	[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function;
+	id: string;
 	module: string;
-	closure: unknown[];
+	closure: Closure;
 };
 
 export type SolenoidSignalConfig = {
