@@ -6,14 +6,21 @@
 		"build": "bun run --filter '*' build",
 		"format": "biome format --write .",
 		"test": "bun run --filter '*' test",
-		"typecheck": "tsc"
+		"typecheck": "tsc",
+		"prepare": "husky",
+		"lint-staged": "lint-staged"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
 		"@tsconfig/bun": "^1.0.7",
 		"@types/bun": "^1.2.3",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.0.0",
 		"typescript": "^5.7.3",
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^3.0.6"
+	},
+	"lint-staged": {
+		"**/*.{js,jsx,ts,tsx,json,md}": ["biome format --write"]
 	}
 }

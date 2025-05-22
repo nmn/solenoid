@@ -1,0 +1,2 @@
+echo "Running format before commit..."
+bun run lint-staged

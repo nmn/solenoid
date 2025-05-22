@@ -1,8 +1,11 @@
 import { describe, expect, test } from "vitest";
 import { transformSync } from "@babel/core";
-import solenoidPlugin, {type PluginOptions} from "../../src";
+import solenoidPlugin, { type PluginOptions } from "../../src";
 
-function transform(code: string, options: PluginOptions = {}): string | null | undefined {
+function transform(
+	code: string,
+	options: PluginOptions = {},
+): string | null | undefined {
 	const res = transformSync(code as string, {
 		plugins: [
 			["@babel/plugin-syntax-typescript", { isTSX: true }],
