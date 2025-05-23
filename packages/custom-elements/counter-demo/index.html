@@ -1,40 +1,171 @@
 <html>
-    <head>
-        <title>
-            Counter Test
-        </title>
-        <script src="../lib/index.js"></script>
-    </head>
-    <let-signal name="count" initial-value="0"></let-signal>
-    <script>
-      window.__FNS__.decr = ($c1) => () => $c1($c1() - 1);
-      window.__FNS__.decAttrs = ($c1) => () => ({onClick: $c1});
-    </script>
-    <signal-attrs value='{"__type":"$$FUNCTION","module":"decAttrs","closure":[{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
-        <button>-</button>
-    </signal-attrs>
-    <signal-text value='{"__type":"$$SIGNAL","id":"count"}'>
-        0
-    </signal-text>
-    <script>
-      window.__FNS__.incr = ($c1) => () => $c1($c1() + 1);
-      window.__FNS__.attrs = ($c1) => () => ({onClick: $c1});
-      window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
-      window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
-    </script>
-    <signal-attrs value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
-        <button>+</button>
-    </signal-attrs>
-    <br/>
-    <br/>
-    <script>
-      window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
-      window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
-    </script>
-    <show-when condition='{"__type":"$$FUNCTION","module":"whenEven","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>
-        is Even!
-    </show-when>
-    <show-when condition='{"__type":"$$FUNCTION","module":"whenOdd","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>
-        is Odd!
-    </show-when>
+  <head>
+    <title>Counter Test</title>
+    <script src="../lib/index.js"></script>
+  </head>
+  <script>
+    function initDark() {
+      try {
+        DarkReader.enable({
+          brightness: 100,
+          contrast: 90,
+          sepia: 10,
+        });
+        console.log("Dark mode enabled");
+      } catch (e) {
+        console.warn("Error enabling DarkReader:", e);
+      }
+    }
+  </script>
+  <script
+    onload="initDark()"
+    src="https://cdnjs.cloudflare.com/ajax/libs/darkreader/4.9.100/darkreader.js"
+    integrity="sha512-VrShkHBDBKBOP8ZSAhsgf035s7Go+x3ClNZCmqDBtJNsVIq9Nd88KVUQPF+RyoveDW+KLv2Nz/Ya4+eqHm16tg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+
+  <!--
+		Example with let-signal, signal-attrs, signal-text
+
+		const count = signal(0);
+		const decr = ()=>count(count()-1);
+		const incr = ()=>count(count()+1);
+
+		return (
+			<>
+				<button onClick={decr}>-</button>
+				{count()}
+				<button onClick={incr}>+</button>
+			</>
+		);
+	-->
+  <let-signal name="count" initial-value="0"></let-signal>
+  <script>
+    window.__FNS__.decr = ($c1) => () => $c1($c1() - 1);
+    window.__FNS__.decAttrs = ($c1) => () => ({ onClick: $c1 });
+  </script>
+  <signal-attrs
+    value='{"__type":"$$FUNCTION","module":"decAttrs","closure":[{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'
+  >
+    <button>-</button>
+  </signal-attrs>
+  <signal-text value='{"__type":"$$SIGNAL","id":"count"}'> 0 </signal-text>
+  <script>
+    window.__FNS__.incr = ($c1) => () => $c1($c1() + 1);
+    window.__FNS__.attrs = ($c1) => () => ({ onClick: $c1 });
+  </script>
+  <signal-attrs
+    value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'
+  >
+    <button>+</button>
+  </signal-attrs>
+
+
+  <br />
+  <br />
+
+
+	<!--
+		Example with show-when
+
+		const whenEven = ()=>count()%2 === 0;
+		const whenOdd = ()=>count()%2 === 1;
+
+		if (whenEven()) {
+			return "is Even!";
+		}
+		else if (whenOdd()) {
+			return "is Odd!";
+		}
+
+		return null;
+	-->
+  <script>
+    window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
+    window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
+  </script>
+  <show-when
+    condition='{"__type":"$$FUNCTION","module":"whenEven","closure":[{"__type":"$$SIGNAL","id":"count"}]}'
+  >
+    is Even!
+  </show-when>
+  <show-when
+    condition='{"__type":"$$FUNCTION","module":"whenOdd","closure":[{"__type":"$$SIGNAL","id":"count"}]}'
+  >
+    is Odd!
+  </show-when>
+
+
+	<template> <!-- Unfinished -- for-each example -->
+		<!--
+			const counterValues = createSignal([-4,1,6]); // Render 3 counters next to each other, each with a different initial value & state
+			
+			const decrIndex = (index)=>{
+				const nextCounterValues = [...counterValues()];
+				nextCounterValues[index]--;
+				counterValues(nextCounterValues);
+			};
+			
+			const incrIndex = (index)=>{
+				const nextCounterValues = [...counterValues()];
+				nextCounterValues[index]++;
+				counterValues(nextCounterValues);
+			};
+
+			return counterValues().map((val, index)=>(
+				<div style={{display: 'block'}}>
+					<div onClick={()=>decrIndex(index)}>-</div>
+					<div>{val}</div>
+					<div onClick={()=>incrIndex(index)}>-</div>
+				</div>
+			));
+		-->
+		<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
+		<script>
+			window.__FNS__.decrIndex = ($c1)=>($p1)=>{
+				const nextCounterValues = [...$c1()];
+				nextCounterValues[index]--;
+				$c1(nextCounterValues);
+			}
+
+			window.__FNS__.incrIndex = ($c1)=>($p1)=>{
+				const nextCounterValues = [...$c1()];
+				nextCounterValues[index]++;
+				$c1(nextCounterValues);
+			}
+
+			window.__FNS__._counterValues__map = ($c1/*decrIndex*/, $c2/*incrIndex*/)=>($p1/*val*/, $p2/*index*/)=>{
+				// this is JSX transform, not solenoid logic
+				const __a = document.createElement('div');
+				Object.assign(__a.style, {
+					display: 'block',
+				});
+
+				const __a_a = document.createElement('div');
+				__a_a.onClick = ()=>$c1($p2);
+				__a_a.innerText = '-';
+
+				const __a_b = document.createElement('div');
+				__a_b.innerText = $p1;
+
+				const __a_c = document.createElement('div');
+				__a_c.onClick = ()=>$c2($p2);
+				__a_c.innerText = '+';
+
+				__a.append(__a_a, __a_b, __a_c);
+				return __a;
+			}
+		</script>
+		<for-each
+			list='{"__type":"$$SIGNAL","id":"counterValues"}'
+		>
+			<signal-attrs
+			value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'
+			>
+				<button>+</button>
+			</signal-attrs>
+		</for-each>
+	</template>
+
 </html>
