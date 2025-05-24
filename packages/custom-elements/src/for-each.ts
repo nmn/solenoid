@@ -1,61 +1,90 @@
-import { effect, effectScope } from "alien-signals";
+import { computed, effect, effectScope } from "alien-signals";
 import { JSON_PARSE } from "./core";
 
-export class ForEach extends HTMLElement {
-  static observedAttributes = ["list"];
+export default class ForEach extends HTMLElement {
+	/*
+  JSX:
+  const counterValues = createSignal([1,2,3]);
 
-  private list: () => Array<HTMLElement | string>;
-  private cleanUp: null | (() => void) = null;
-  private templateHTML: string | null = null;
+  <for-each
+    values={counterValues}
+    map={(counterValue, index)=>(
+      <div style={{display: 'inline-block'}}>
+        {counterValue()}
+      </div>
+    )}
+  />
 
-  isConnected = true;
+  HTML:
+  <for-each values="/signal serialized/" map="/arrow func serialized/">
+    <list-item index="0">
+      <div style="display: block;">
+        <signal-text value='{"__type":"$$COMPUTED_SIGNAL","index":"0"}'>
+      </div>
+    </list-item>
+    <list-item index="1">
+      <div style="display: block;">
+        <signal-text value='{"__type":"$$COMPUTED_SIGNAL","index":"1"}'>
+      </div>
+    </list-item>
+    <list-item index="2">
+      <div style="display: block;">
+        <signal-text value='{"__type":"$$COMPUTED_SIGNAL","index":"2"}'>
+      </div>
+    </list-item>
+  </for-each>
+  */
+	static observedAttributes = ["values", "map"];
 
-  async connectedCallback() {
-    if (!this.isConnected) {
-      return;
-    }
+	private values: () => unknown[];
+  private map: (val: unknown, index: number)=>HTMLElement | string;
+	isConnected = true;
+	private cleanUp: null | (() => void) = null;
+	private abortController: AbortController = new AbortController();
 
-    const list = this.getAttribute("list");
-    if (!list) {
-      throw new Error(
-        'for-each must have a "list" attribute'
-      );
-    }
+	async connectedCallback() {
+		if (!this.isConnected) return;
+		const values = this.getAttribute("values");
+		if (!values) {
+			throw new Error("for-each must have a \"values\" attribute");
+		}
+    const map = this.getAttribute("map");
+    if (!map) {
+			throw new Error("for-each must have a \"map\" attribute");
+		}
+    
+		this.isConnected = true;
+		const [parsedValues, parsedMap] = await Promise.all([JSON_PARSE(values), JSON_PARSE(map)])
 
-    this.isConnected = true;
-    const parsedValue = await JSON_PARSE(list);
+		if (parsedValues && typeof parsedValues === "function" && parsedMap && typeof parsedMap === 'function') {
+			this.values = parsedValues;
+      this.map = parsedMap;
 
-    if (!this.isConnected) {
-      return;
-    }
+			requestAnimationFrame(() => this.render());
+		} else {
+			this.isConnected = false;
+		}
+	}
 
-    if (parsedValue && typeof parsedValue === "function") {
-      this.list = parsedValue;
-
-      requestAnimationFrame(() => this.render());
-    } else {
-      this.isConnected = false;
-    }
-  }
-
-  render(value?: unknown) {
-    this.cleanUp && this.cleanUp();
-    this.templateHTML ??= this.innerHTML;
-    const stopScope = effectScope(() => {
-      effect(() => {
-        const arr = this.list();
-        // temp solution, wipe the existing inside (do not use long term)
+	render() {
+    const stopScope = effectScope(()=>{
+      effect(()=>{
         this.innerHTML = '';
-        this.append(...arr);
+        const nodes = this.values().map((_, index)=>{
+          return this.map(computed(()=>this.values()[index]), index);
+        });
+
+        this.append(...nodes);
       });
     });
-    this.cleanUp = stopScope;
-  }
 
-  disconnectedCallback() {
-    this.cleanUp?.();
-    this.isConnected = false;
-  }
+		this.cleanUp = stopScope;
+	}
+
+	disconnectedCallback() {
+		this.cleanUp && this.cleanUp();
+		this.isConnected = false;
+	}
 }
 
 customElements.define("for-each", ForEach);

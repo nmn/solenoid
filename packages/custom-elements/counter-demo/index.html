@@ -97,7 +97,7 @@
   </show-when>
 
 
-	<template> <!-- Unfinished -- for-each example -->
+	<!-- Unfinished -- for-each example -->
 		<!--
 			const counterValues = createSignal([-4,1,6]); // Render 3 counters next to each other, each with a different initial value & state
 			
@@ -113,44 +113,50 @@
 				counterValues(nextCounterValues);
 			};
 
-			return counterValues().map((val, index)=>(
-				<div style={{display: 'block'}}>
-					<div onClick={()=>decrIndex(index)}>-</div>
-					<div>{val}</div>
-					<div onClick={()=>incrIndex(index)}>-</div>
-				</div>
-			));
+			return (
+				<for-each
+					values={counterValues}
+					map={(counterValue, index)=>(
+						<div style={{display: 'block'}}>
+							<div onClick={()=>decrIndex(index)}>-</div>
+							{counterValue()}
+							<div onClick={()=>incrIndex(index)}>-</div>
+						</div>
+					)}
+				/>
+			);
 		-->
 		<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
 		<script>
 			window.__FNS__.decrIndex = ($c1)=>($p1)=>{
-				const nextCounterValues = [...$c1()];
-				nextCounterValues[index]--;
+				const arr = $c1();
+				const nextCounterValues = [...arr];
+				nextCounterValues[$p1]--;
 				$c1(nextCounterValues);
 			}
 
 			window.__FNS__.incrIndex = ($c1)=>($p1)=>{
+				console.log('called incr');
 				const nextCounterValues = [...$c1()];
-				nextCounterValues[index]++;
+				nextCounterValues[$p1]++;
 				$c1(nextCounterValues);
 			}
 
-			window.__FNS__._counterValues__map = ($c1/*decrIndex*/, $c2/*incrIndex*/)=>($p1/*val*/, $p2/*index*/)=>{
+			window.__FNS__.__counterValues__map = ($c1/*decrIndex*/, $c2/*incrIndex*/)=>($p1/*val*/, $p2/*index*/)=>{
 				// this is JSX transform, not solenoid logic
 				const __a = document.createElement('div');
 				Object.assign(__a.style, {
 					display: 'block',
 				});
 
-				const __a_a = document.createElement('div');
-				__a_a.onClick = ()=>$c1($p2);
+				const __a_a = document.createElement('button');
+				__a_a.addEventListener('click', ()=>$c1($p2));
 				__a_a.innerText = '-';
 
-				const __a_b = document.createElement('div');
-				__a_b.innerText = $p1;
+				const __a_b = $p1();
 
-				const __a_c = document.createElement('div');
-				__a_c.onClick = ()=>$c2($p2);
+				const __a_c = document.createElement('button');
+				__a_c.addEventListener('click', ()=>$c2($p2));
 				__a_c.innerText = '+';
 
 				__a.append(__a_a, __a_b, __a_c);
@@ -158,14 +164,28 @@
 			}
 		</script>
 		<for-each
-			list='{"__type":"$$SIGNAL","id":"counterValues"}'
+			values='{"__type":"$$SIGNAL","id":"counterValues"}'
+    	map='{
+				"__type":"$$FUNCTION",
+				"module":"__counterValues__map",
+				"closure":[
+					{
+						"__type":"$$FUNCTION",
+						"module":"decrIndex",
+						"closure": [
+							{"__type":"$$SIGNAL","id":"counterValues"}
+						]
+					},
+					{
+						"__type":"$$FUNCTION",
+						"module":"incrIndex",
+						"closure": [
+							{"__type":"$$SIGNAL","id":"counterValues"}
+						]
+					}
+				]
+			}'
 		>
-			<signal-attrs
-			value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'
-			>
-				<button>+</button>
-			</signal-attrs>
 		</for-each>
-	</template>
 
 </html>
