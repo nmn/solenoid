@@ -6,6 +6,7 @@ import { declare } from "@babel/helper-plugin-utils";
 import { addNamed } from "@babel/helper-module-imports";
 import { getIsolatedArrowFunctionAndVars } from "./helpers/transformArrowFunction";
 import generate from "@babel/generator";
+// @ts-ignore
 import murmurhash from "murmurhash";
 
 // We don't have plugin options at the moment.
@@ -28,6 +29,27 @@ export default declare((api: BabelAPI, _options: PluginOptions): PluginObj => {
 						"@solenoid/server-runtime",
 					);
 					globalName = addNamed(path, "globalName", "@solenoid/server-runtime");
+
+					path.traverse({
+						JSXExpressionContainer(path: NodePath<t.JSXExpressionContainer>) {
+							const expression = path.get("expression");
+							if (!expression.isExpression()) {
+								return;
+							}
+							if (
+								expression.isCallExpression() &&
+								expression.get("arguments").length === 0
+							) {
+								const callee = expression.get("callee").node;
+								expression.replaceWith(callee);
+							} else {
+								const expressionNode = expression.node;
+								expression.replaceWith(
+									t.arrowFunctionExpression([], expressionNode),
+								);
+							}
+						},
+					});
 				},
 				exit(path: NodePath<t.Program>) {
 					for (const [name, value] of Object.entries(fns)) {

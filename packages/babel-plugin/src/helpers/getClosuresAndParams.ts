@@ -39,17 +39,27 @@ function getClosures(
 ): Set<string> {
 	const set = new Set<string>();
 
-	arrowPath.get("body").traverse({
-		Identifier(identifierPath) {
-			if (
-				!isClosureIdentifier(arrowPath, paramsSet, identifierPath, ignoredNames)
-			) {
-				return;
-			}
-
-			set.add(identifierPath.node.name);
-		},
-	});
+	const arrowBody = arrowPath.get("body");
+	if (arrowBody.isIdentifier()) {
+		if (isClosureIdentifier(arrowPath, paramsSet, arrowBody, ignoredNames)) {
+			set.add(arrowBody.node.name);
+		}
+	} else {
+		arrowBody.traverse({
+			Identifier(identifierPath) {
+				if (
+					isClosureIdentifier(
+						arrowPath,
+						paramsSet,
+						identifierPath,
+						ignoredNames,
+					)
+				) {
+					set.add(identifierPath.node.name);
+				}
+			},
+		});
+	}
 
 	return set;
 }

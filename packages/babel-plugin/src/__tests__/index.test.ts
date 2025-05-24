@@ -104,6 +104,48 @@ describe("Babel Plugin tests", async () => {
     `);
 	});
 
+	test("minimal component", () => {
+		const code = `
+      function MyComponent() {
+        const count = signal(0);
+        const increment = () => count(count() + 1);
+
+        return (
+          <button onClick={increment}>+</button>
+        );
+      }
+    `;
+
+		const transformedCode = transform(code);
+
+		expect(transformedCode).toMatchInlineSnapshot(`
+      "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
+      const _17428hj = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0;
+        return $r;
+      };
+      const _hxdr80 = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0($c0() + 1);
+        return $r;
+      };
+      function MyComponent() {
+        const count = signal(0);
+        const increment = _serializableFn({
+          fn: _hxdr80,
+          closure: () => [count],
+          id: "_hxdr80"
+        });
+        return <button onClick={_serializableFn({
+          fn: _17428hj,
+          closure: () => [increment],
+          id: "_17428hj"
+        })}>+</button>;
+      }"
+    `);
+	});
+
 	test("counter component", () => {
 		const code = `
       function MyComponent() {
@@ -124,6 +166,11 @@ describe("Babel Plugin tests", async () => {
 
 		expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
+      const _17428hj = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0;
+        return $r;
+      };
       const _db4zf6 = $$closure => {
         const [$c0] = $$closure();
         const $r = () => $c0($c0() - 1);
@@ -147,12 +194,67 @@ describe("Babel Plugin tests", async () => {
           id: "_db4zf6"
         });
         return <div>
-                  <button onClick={decrement}>-</button>
-                  <span>{count()}</span>
-                  <button onClick={increment}>+</button>
+                  <button onClick={_serializableFn({
+            fn: _17428hj,
+            closure: () => [decrement],
+            id: "_17428hj"
+          })}>-</button>
+                  <span>{count}</span>
+                  <button onClick={_serializableFn({
+            fn: _17428hj,
+            closure: () => [increment],
+            id: "_17428hj"
+          })}>+</button>
                 </div>;
       }"
     `);
+	});
+
+	test("JSX with inline functions", () => {
+		const code = `
+      function MyComponent() {
+        const count = signal(0);
+
+        return (
+          <div>
+            <button onClick={() => () => count(count() - 1)}>-</button>
+            <span>{count()}</span>
+            <button onClick={() => count(count() + 1)}>+</button>
+          </div>
+        );
+      }
+    `;
+		const transformedCode = transform(code);
+
+		expect(transformedCode).toMatchInlineSnapshot(`
+		  "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
+		  const _1op3z9a = $$closure => {
+		    const [$c0] = $$closure();
+		    const $r = () => () => $c0($c0() + 1);
+		    return $r;
+		  };
+		  const _k84tgp = $$closure => {
+		    const [$c0] = $$closure();
+		    const $r = () => () => () => $c0($c0() - 1);
+		    return $r;
+		  };
+		  function MyComponent() {
+		    const count = signal(0);
+		    return <div>
+		              <button onClick={_serializableFn({
+		        fn: _k84tgp,
+		        closure: () => [count],
+		        id: "_k84tgp"
+		      })}>-</button>
+		              <span>{count}</span>
+		              <button onClick={_serializableFn({
+		        fn: _1op3z9a,
+		        closure: () => [count],
+		        id: "_1op3z9a"
+		      })}>+</button>
+		            </div>;
+		  }"
+		  `);
 	});
 
 	test("Slightly more", () => {
@@ -181,6 +283,11 @@ describe("Babel Plugin tests", async () => {
 
 		expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
+      const _17428hj = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0;
+        return $r;
+      };
       const _1xwtz1r = $$closure => {
         const [$c0] = $$closure();
         const $r = event => {
@@ -210,9 +317,17 @@ describe("Babel Plugin tests", async () => {
           id: "_1xwtz1r"
         });
         return <div>
-                  <button onClick={decrement}>-</button>
-                  <span>{count()}</span>
-                  <button onClick={increment}>+</button>
+                  <button onClick={_serializableFn({
+            fn: _17428hj,
+            closure: () => [decrement],
+            id: "_17428hj"
+          })}>-</button>
+                  <span>{count}</span>
+                  <button onClick={_serializableFn({
+            fn: _17428hj,
+            closure: () => [increment],
+            id: "_17428hj"
+          })}>+</button>
                 </div>;
       }"
     `);
@@ -248,6 +363,11 @@ describe("Babel Plugin tests", async () => {
 
 		expect(transformedCode).toMatchInlineSnapshot(`
       "import { serializableFn as _serializableFn, globalName as _globalName } from "@solenoid/server-runtime";
+      const _17428hj = $$closure => {
+        const [$c0] = $$closure();
+        const $r = () => $c0;
+        return $r;
+      };
       const _1u6a343 = $$closure => {
         const [$c0] = $$closure();
         const $r = event => {
@@ -280,9 +400,17 @@ describe("Babel Plugin tests", async () => {
           id: "_1u6a343"
         });
         return <div>
-                  <button onClick={decrement}>-</button>
-                  <span>{count()}</span>
-                  <button onClick={onIncrementClick}>+</button>
+                  <button onClick={_serializableFn({
+            fn: _17428hj,
+            closure: () => [decrement],
+            id: "_17428hj"
+          })}>-</button>
+                  <span>{count}</span>
+                  <button onClick={_serializableFn({
+            fn: _17428hj,
+            closure: () => [onIncrementClick],
+            id: "_17428hj"
+          })}>+</button>
                 </div>;
       }"
     `);
