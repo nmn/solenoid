@@ -191,26 +191,8 @@
 		<for-each
 			values='{"__type":"$$SIGNAL","id":"counterValues"}'
 		>
-			<list-item index="0" id="#81051">
-				<!-- <template> -->
-					<!-- "onClick": {
-									"__type": "$$FUNCTION",
-									"module": "__decrIndex_withClosure",
-									"closure": [
-										{
-											"__type":"$$FUNCTION",
-											"module":"decrIndex",
-											"closure": [
-												{"__type":"$$SIGNAL","id":"counterValues"}
-											]
-										},
-										{
-											"__type":"$$FUNCTION",
-											"module":"__getIndex_injected",
-											"closure":[]
-										}
-									]
-								} -->
+			<template>
+				<list-item index="0" id="#81051">
 					<div style="display: block;">
 						<signal-attrs
 							value='{
@@ -234,8 +216,8 @@
 						}'>
 						</signal-text>
 					</div>
-				<!-- </template> -->
-			</list-item>
+				</list-item>
+			</template>
 		</for-each>
 
 </html>
