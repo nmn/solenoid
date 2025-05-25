@@ -1,5 +1,6 @@
-import { signal } from "alien-signals";
+import { computed, signal } from "alien-signals";
 import {
+	isSolenoidComputedSignal,
 	isSolenoidFunction,
 	isSolenoidSignal,
 	type Signal,
@@ -9,6 +10,8 @@ declare const window: {
 	__FNS__: Record<string, (...args: any[]) => any>;
 	signalStore: SignalStore;
 };
+
+const contextValues = [];
 
 const hydrateJSON = async (value: unknown) => {
 	if (Array.isArray(value)) {
@@ -27,6 +30,11 @@ const hydrateJSON = async (value: unknown) => {
 		if (isSolenoidSignal(value)) {
 			const signalObj = value;
 			return await signalStore.awaitGet(signalObj.id);
+		}
+		if (isSolenoidComputedSignal(value)) {
+			const {compute: computeObj, signal: signalObj} = value;
+			const compute = await hydrateJSON(computeObj);
+			return await signalStore.awaitCompute(signalObj.id, compute);
 		}
 
 		const patchPromises = Object.entries(value).map(async ([key, val]) => {
@@ -100,6 +108,11 @@ class SignalStore {
 			return (await promise) as any;
 		}
 		return signal;
+	}
+
+	async awaitCompute<T>(id: string, cb: (_signal: Signal<any>)=>T): Promise<() => T> {
+		const signal = await this.awaitGet(id);
+		return computed(()=>cb(signal));
 	}
 }
 

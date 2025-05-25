@@ -118,17 +118,17 @@
 					values={counterValues}
 					map={(counterValue, index)=>(
 						<div style={{display: 'block'}}>
-							<div onClick={()=>decrIndex(index)}>-</div>
+							<button onClick={()=>decrIndex(index())}>-</button>
 							{counterValue()}
-							<div onClick={()=>incrIndex(index)}>-</div>
+							<button onClick={()=>incrIndex(index())}>-</button>
 						</div>
 					)}
 				/>
 			);
 		-->
-		<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
 		<script>
 			window.__FNS__.decrIndex = ($c1)=>($p1)=>{
+				console.log('decrement');
 				const arr = $c1();
 				const nextCounterValues = [...arr];
 				nextCounterValues[$p1]--;
@@ -142,50 +142,141 @@
 				$c1(nextCounterValues);
 			}
 
-			window.__FNS__.__counterValues__map = ($c1/*decrIndex*/, $c2/*incrIndex*/)=>($p1/*val*/, $p2/*index*/)=>{
-				// this is JSX transform, not solenoid logic
-				const __a = document.createElement('div');
-				Object.assign(__a.style, {
-					display: 'block',
-				});
+			window.__FNS__.__counterValues__map__decr = (decrIndex) => (counterValue, index) => {
+				return ()=>decrIndex(index());
+			}
 
-				const __a_a = document.createElement('button');
-				__a_a.addEventListener('click', ()=>$c1($p2));
-				__a_a.innerText = '-';
+			// window.__FNS__.__counterValues__map = ($c1/*decrIndex*/, $c2/*incrIndex*/)=>($p1/*val*/, $p2/*index*/)=>{
+			// 	// this is JSX transform, not solenoid logic
+			// 	const __a = document.createElement('div');
+			// 	Object.assign(__a.style, {
+			// 		display: 'block',
+			// 	});
 
-				const __a_b = $p1();
+			// 	const __a_a = document.createElement('button');
+			// 	__a_a.addEventListener('click', ()=>$c1($p2));
+			// 	__a_a.innerText = '-';
 
-				const __a_c = document.createElement('button');
-				__a_c.addEventListener('click', ()=>$c2($p2));
-				__a_c.innerText = '+';
+			// 	const __a_b = $p1();
 
-				__a.append(__a_a, __a_b, __a_c);
-				return __a;
+			// 	const __a_c = document.createElement('button');
+			// 	__a_c.addEventListener('click', ()=>$c2($p2));
+			// 	__a_c.innerText = '+';
+
+			// 	__a.append(__a_a, __a_b, __a_c);
+			// 	return __a;
+			// }
+
+			window.__FNS__.__decrIndex_withClosure = (decrIndex, index) => () => decrIndex(index());
+
+			window.__FNS__.__getIndex_injected = ()=>()=>{
+				const listItem = document.getElementById('#81051');
+				const index = Number(listItem.getAttribute('index'));
+				console.log('got index', index);
+				return index;
+			}
+
+			window.__FNS__.__getOnClickByIndex = (counterValues)=>()=>{
+				return {onClick: window.__FNS__.__decrIndex_withClosure(
+					window.__FNS__.decrIndex(counterValues),
+					window.__FNS__.__getIndex_injected(),
+				)};
+			}
+
+			window.__FNS__.__getComputedValue = (counterValues)=>()=>{
+				return counterValues()[0];
 			}
 		</script>
+		<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
 		<for-each
 			values='{"__type":"$$SIGNAL","id":"counterValues"}'
-    	map='{
-				"__type":"$$FUNCTION",
-				"module":"__counterValues__map",
-				"closure":[
-					{
-						"__type":"$$FUNCTION",
-						"module":"decrIndex",
-						"closure": [
-							{"__type":"$$SIGNAL","id":"counterValues"}
-						]
-					},
-					{
-						"__type":"$$FUNCTION",
-						"module":"incrIndex",
-						"closure": [
-							{"__type":"$$SIGNAL","id":"counterValues"}
-						]
-					}
-				]
-			}'
 		>
+			<list-item index="0" id="#81051">
+				<!-- <template> -->
+					<!-- "onClick": {
+									"__type": "$$FUNCTION",
+									"module": "__decrIndex_withClosure",
+									"closure": [
+										{
+											"__type":"$$FUNCTION",
+											"module":"decrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type":"$$FUNCTION",
+											"module":"__getIndex_injected",
+											"closure":[]
+										}
+									]
+								} -->
+					<div style="display: block;">
+						<signal-attrs
+							value='{
+								"__type": "$$FUNCTION",
+								"module": "__getOnClickByIndex",
+								"closure": [
+									{"__type":"$$SIGNAL","id":"counterValues"}
+								]
+							}'
+						>
+							<button>-</button>
+						</signal-attrs>
+						<signal-text value='{
+							"__type":"$$COMPUTED",
+							"signal":{"__type":"$$SIGNAL","id":"counterValues"},
+							"compute": {
+								"__type":"$$FUNCTION",
+								"module":"__getComputedValue",
+								"closure": [{"__type":"$$SIGNAL","id":"counterValues"}]
+							}
+						}'>
+						</signal-text>
+					</div>
+				<!-- </template> -->
+			</list-item>
 		</for-each>
 
 </html>
+
+
+<!-- map='{
+	"__type":"$$FUNCTION",
+	"module":"__counterValues__map",
+	"closure":[
+		{
+			"__type":"$$FUNCTION",
+			"module":"decrIndex",
+			"closure": [
+				{"__type":"$$SIGNAL","id":"counterValues"}
+			]
+		},
+		{
+			"__type":"$$FUNCTION",
+			"module":"incrIndex",
+			"closure": [
+				{"__type":"$$SIGNAL","id":"counterValues"}
+			]
+		}
+	]
+}' -->
+
+<!-- 
+"module":"__counterValues__map__decr",
+"closure":[{
+	"__type":"$$FUNCTION",
+	
+	"module":"__counterValues__map__decr",
+	"closure":[{
+		"__type":"$$FUNCTION",
+		"module":"decrIndex",
+		"closure": [
+			{
+				"__type": "$$SIGNAL",
+				"id": "counterValues"
+			}
+		]
+	}]
+}]
+-->
