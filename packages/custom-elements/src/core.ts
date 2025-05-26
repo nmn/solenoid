@@ -54,7 +54,7 @@ export const JSON_PARSE = async (value: string) => {
 	return hydratedValue;
 };
 
-export function createSignal<T>(id: string, initialValue: T): Signal<T> {
+export function createSignal<T extends any>(id: string, initialValue: T): Signal<T> {
 	return signal(initialValue);
 }
 
@@ -95,7 +95,7 @@ class SignalStore {
 	async awaitGet(id: string): Promise<Signal<any>> {
 		const signal = this.store.get(id);
 		if (signal == null) {
-			const { promise, resolve, reject } = Promise.withResolvers();
+			const { promise, resolve, reject: _reject } = Promise.withResolvers();
 			this.resolvers.set(id, resolve);
 			return (await promise) as any;
 		}

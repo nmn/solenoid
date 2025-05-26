@@ -4,10 +4,9 @@ import type { Signal } from "./utils/types";
 export class LetSignal<T> extends HTMLElement {
 	static observedAttributes = ["name", "initial-value"];
 
-	ready = false;
-	signal: Signal<T>;
-	name: string;
-	initialValue: T;
+	private name?: string;
+	private signal?: Signal<T | null>;
+	initialValue?: T | null;
 
 	connectedCallback() {
 		const name = this.getAttribute("name");
@@ -18,7 +17,7 @@ export class LetSignal<T> extends HTMLElement {
 		this.name = name;
 		this.initialValue = JSON.parse(
 			this.getAttribute("initial-value") || "null",
-		);
+		) as T | null;
 		this.signal = createSignal(this.name, this.initialValue);
 		signalStore.set(this.name, this.signal);
 	}
@@ -40,10 +39,11 @@ export class LetSignal<T> extends HTMLElement {
 		}
 	}
 
-	getSignal(): undefined | Signal<T> {
+	getSignal(): undefined | Signal<T | null> {
 		if (this.signal == null) {
-			if (this.name != null && this.initialValue !== undefined) {
-				this.signal = createSignal(this.name, this.initialValue) as any;
+			const initialValue = this.initialValue;
+			if (this.name != null && initialValue !== undefined) {
+				this.signal = createSignal(this.name, initialValue as T | null);
 				signalStore.set(this.name, this.signal);
 			}
 		}
@@ -51,7 +51,7 @@ export class LetSignal<T> extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		signalStore.delete(this.name);
+		signalStore.delete(this.name!);
 	}
 }
 
