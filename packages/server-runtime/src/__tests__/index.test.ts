@@ -41,7 +41,7 @@ describe("server-runtime", () => {
 			});
 
 			// This is broken since currently we only do typeof var === 'object'
-			expect(isSolenoidFunction(fn)).toBe(true);
+			expect(isSolenoidFunction(fn.toJSON())).toBe(true);
 		});
 	});
 });

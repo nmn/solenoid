@@ -8,7 +8,8 @@
 	"license": "MIT",
 	"scripts": {
 		"watch": "bun build --outfile=lib/index.js ./src/index.ts --watch",
-		"build": "bun build --minify --production --target=browser --outfile=lib/index.js ./src/index.ts"
+		"build": "bun build --minify --production --target=browser --outfile=lib/index.js ./src/index.ts",
+		"test": "vitest"
 	},
 	"dependencies": {
 		"alien-signals": "^2.0.4",

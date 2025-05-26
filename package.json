@@ -5,7 +5,7 @@
 	"scripts": {
 		"build": "bun run --filter '*' build",
 		"format": "biome format --write .",
-		"test": "bun run --filter '*' test",
+		"test": "vitest",
 		"typecheck": "tsc",
 		"prepare": "husky",
 		"lint-staged": "lint-staged"
