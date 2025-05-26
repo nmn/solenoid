@@ -1,9 +1,11 @@
-import { computed, signal } from "alien-signals";
+import { signal } from "alien-signals";
 import {
 	isSolenoidFunction,
 	isSolenoidSignal,
 	type Signal,
 } from "./utils/types";
+
+export type {Signal};
 
 declare const window: {
 	__FNS__: Record<string, (...args: any[]) => any>;
@@ -58,8 +60,6 @@ export function createSignal<T>(id: string, initialValue: T): Signal<T> {
 	return signal(initialValue);
 }
 
-export type {Signal};
-
 class SignalStore {
 	store = new Map<string, Signal<any>>();
 	resolvers = new Map<string, (value: any) => void>();
@@ -102,11 +102,6 @@ class SignalStore {
 			return (await promise) as any;
 		}
 		return signal;
-	}
-
-	async awaitCompute<T>(id: string, cb: (_signal: Signal<any>)=>T): Promise<() => T> {
-		const signal = await this.awaitGet(id);
-		return computed(()=>cb(signal));
 	}
 }
 
