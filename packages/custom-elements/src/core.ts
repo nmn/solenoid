@@ -54,10 +54,7 @@ export const JSON_PARSE = async (value: string) => {
 	return hydratedValue;
 };
 
-export function createSignal<T>(
-	id: string,
-	initialValue: T,
-): Signal<T> {
+export function createSignal<T>(id: string, initialValue: T): Signal<T> {
 	return signal(initialValue);
 }
 
