@@ -5,8 +5,8 @@ import {
 } from "@solenoid/custom-elements/dist/utils/types";
 
 type Options = {
-	id: SolenoidGlobalNameConfig['id'],
-}
+	id: SolenoidGlobalNameConfig["id"];
+};
 
 export function globalName({ id }: Options): SolenoidGlobalNameConfig {
 	return {

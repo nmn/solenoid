@@ -42,7 +42,7 @@ export class SignalText extends HTMLElement {
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
-		const value = this.getAttribute('value');
+		const value = this.getAttribute("value");
 		if (!value) {
 			throw new Error("signal-text must have a value attribute");
 		}
