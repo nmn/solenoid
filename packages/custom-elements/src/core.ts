@@ -59,8 +59,8 @@ export function createSignal<T extends any>(id: string, initialValue: T): Signal
 }
 
 class SignalStore {
-	store = new Map<string, Signal<any>>();
-	resolvers = new Map<string, (value: any) => void>();
+	private store = new Map<string, Signal<any>>();
+	private resolvers = new Map<string, (value: any) => void>();
 
 	get(id: string) {
 		return this.store.get(id);
