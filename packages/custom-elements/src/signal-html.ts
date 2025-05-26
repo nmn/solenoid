@@ -34,7 +34,7 @@ export class SignalText extends HTMLElement {
     </await-suspense>
   </div>
   */
-	// static observedAttributes = ["value"];
+	static observedAttributes = ["value"];
 
 	private cleanUp: null | (() => void) = null;
 	private value?: () => unknown;
