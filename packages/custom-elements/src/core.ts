@@ -58,15 +58,34 @@ export function createSignal<T>(id: string, initialValue: T): Signal<T> {
 	return signal(initialValue);
 }
 
+type Resolver = (value: Signal<any>) => void;
+
 class SignalStore {
 	store = new Map<string, Signal<any>>();
-	resolvers = new Map<string, (value: any) => void>();
+	resolvers = new Map<string, Array<Resolver>>();
+
+	private setResolver(id: string, value: (v: Signal<any>) => void) {
+		if (!this.resolvers.has(id)) {
+			this.resolvers.set(id, []);
+		}
+
+		this.resolvers.get(id)!.push(value);
+	}
+
+	private async resolveAllFor(id: string, signal: Signal<any>): Promise<void> {
+		await Promise.all(
+			(this.resolvers.get(id) ?? []).map((fn) => {
+				fn(signal);
+			}),
+		);
+	}
 
 	get(id: string) {
 		return this.store.get(id);
 	}
 	set(id: string, value: Signal<any>) {
-		return this.store.set(id, value);
+		this.store.set(id, value);
+		this.resolveAllFor(id, value);
 	}
 	delete(id: string) {
 		return this.store.delete(id);
@@ -95,8 +114,8 @@ class SignalStore {
 	async awaitGet(id: string): Promise<Signal<any>> {
 		const signal = this.store.get(id);
 		if (signal == null) {
-			const { promise, resolve, reject } = Promise.withResolvers();
-			this.resolvers.set(id, resolve);
+			const { promise, resolve, reject } = Promise.withResolvers<Signal<any>>();
+			this.setResolver(id, resolve);
 			return (await promise) as any;
 		}
 		return signal;
