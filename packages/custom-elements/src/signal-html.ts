@@ -187,7 +187,7 @@ export class ShowWhen extends HTMLElement {
 		}
 	}
 
-	render(value?: unknown) {
+	render() {
 		this.cleanUp && this.cleanUp();
 		this.templateHTML ??= this.innerHTML;
 		const stopScope = effectScope(() => {

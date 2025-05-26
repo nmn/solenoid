@@ -10,7 +10,7 @@ declare const window: {
 	signalStore: SignalStore;
 };
 
-const hydrateJSON = async (value: unknown) => {
+const hydrateJSON = async (value: unknown): Promise<unknown> => {
 	if (Array.isArray(value)) {
 		return await Promise.all(value.map(hydrateJSON));
 	}
