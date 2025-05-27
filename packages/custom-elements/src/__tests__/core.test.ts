@@ -1,8 +1,15 @@
-import { describe, expect, test, afterEach, vi } from "vitest";
+import type { SolenoidFunctionConfig } from "../utils/types";
+
+import { describe, expect, test, afterEach, vi, beforeEach } from "vitest";
 import delay from "delay";
-import { createSignal, signalStore } from "../core";
+import { createSignal, JSON_PARSE, signalStore } from "../core";
+import { SOLENOID_CUSTOM_KEY, SOLENOID_OBJECT_TYPES } from "../utils/types";
 
 describe("core", () => {
+	beforeEach(() => {
+		window.__FNS__ = {};
+	});
+
 	describe("signalStore", () => {
 		afterEach(() => {
 			signalStore.clear();
@@ -29,5 +36,62 @@ describe("core", () => {
 			await promise;
 			expect(spy).toHaveBeenCalledExactlyOnceWith(signal);
 		});
+	});
+
+	describe("JSON_PARSE", () => {
+		test("can hydrate any regular json value", async () => {
+			const values = [
+				{},
+				{ foo: "bar", "foo-bar": null },
+				["a", "b", { c: true }],
+				100,
+				null,
+			] as any[];
+			const jsonStrs = values.map((v) => JSON.stringify(v)) as string[];
+
+			const results = await Promise.all(jsonStrs.map((str) => JSON_PARSE(str)));
+			expect(results).toStrictEqual(values);
+		});
+
+		test("can hydrate a solenoid function config", async () => {
+			const moduleName = "bar";
+			const fakeModuleWithClosure = vi.fn(
+				(...args: string[]) =>
+					(...args2: string[]) => [...args, ...args2],
+			);
+			window.__FNS__[moduleName] = fakeModuleWithClosure;
+
+			const closure = ["a", "b", "c"];
+
+			const config: Omit<SolenoidFunctionConfig, "toJSON"> = {
+				[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function,
+				module: moduleName,
+				id: "",
+				closure,
+			};
+
+			const stringifiedConfig = JSON.stringify(config);
+			const res = await JSON_PARSE(stringifiedConfig);
+
+			expect(res).toBeTypeOf("function");
+
+			const local = ["d", "e", "f"];
+			expect(res(...local)).toEqual([...closure, ...local]);
+			expect(fakeModuleWithClosure).toHaveBeenCalledExactlyOnceWith(...closure);
+		});
+
+		// test('can hydrate solenoid signal config', async ()=>{});
+
+		// test('can hydrate nested solenoid configs', ()=>{
+
+		// });
+
+		// test('errors if object is like a solenoid config but with an invalid value', ()=>{
+
+		// });
+
+		// test('can properly turn a solenoid config back into a real value', ()=>{
+
+		// });
 	});
 });
