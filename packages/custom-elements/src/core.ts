@@ -73,11 +73,15 @@ class SignalStore {
 	}
 
 	private async resolveAllFor(id: string, signal: Signal<any>): Promise<void> {
-		await Promise.all(
-			(this.resolvers.get(id) ?? []).map((fn) => {
-				fn(signal);
-			}),
-		);
+		const resolvers = this.resolvers.get(id) ?? [];
+		this.resolvers.set(id, []);
+
+		const results = await Promise.allSettled(resolvers.map((fn) => fn(signal)));
+
+		if (process.env.NODE_ENV === "development") {
+			const errs = results.filter((v) => v.status !== "fulfilled");
+			console.error(`${errs.length} resolvers did not resolve for id: ${id}`);
+		}
 	}
 
 	get(id: string) {
