@@ -1,5 +1,9 @@
-import type { SolenoidFunctionConfig } from "../utils/types";
+import type {
+	SolenoidFunctionConfig,
+	SolenoidSignalConfig,
+} from "../utils/types";
 
+import { effect } from "alien-signals";
 import { describe, expect, test, afterEach, vi, beforeEach } from "vitest";
 import delay from "delay";
 import { createSignal, JSON_PARSE, signalStore } from "../core";
@@ -80,7 +84,45 @@ describe("core", () => {
 			expect(fakeModuleWithClosure).toHaveBeenCalledExactlyOnceWith(...closure);
 		});
 
-		// test('can hydrate solenoid signal config', async ()=>{});
+		test("can hydrate solenoid signal config", async () => {
+			const testSignalId = "foobarbazfoo";
+			const expectedValue1 = Symbol(1);
+
+			signalStore.set(testSignalId, createSignal(testSignalId, expectedValue1));
+
+			const config: SolenoidSignalConfig = {
+				[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Signal,
+				id: testSignalId,
+			};
+
+			const stringifiedConfig = JSON.stringify(config);
+			const signal = await JSON_PARSE(stringifiedConfig);
+
+			expect(signal).toBeTypeOf("function");
+			expect(signal()).toBe(expectedValue1);
+
+			const { promise, resolve } = Promise.withResolvers();
+			let i = 0;
+			const fakeFn = vi.fn(() => {
+				signal();
+				if (i > 0) {
+					resolve();
+				}
+				i++;
+			});
+
+			effect(fakeFn);
+			fakeFn.mockClear(); // during initialization of an effect, it's expected for it to run the cb just to subscribe
+
+			await delay(0); // wait for next tick just in case effect does kick for any reason
+
+			const expectedValue2 = Symbol(2);
+			signal(expectedValue2);
+			await promise; // wait for the effect to kick
+
+			expect(signal()).toBe(expectedValue2);
+			expect(fakeFn).toHaveBeenCalledOnce();
+		});
 
 		// test('can hydrate nested solenoid configs', ()=>{
 
