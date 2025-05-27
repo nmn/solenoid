@@ -1,6 +1,6 @@
 import { isSolenoidFunction } from "@solenoid/custom-elements/dist/utils/types";
 import { describe, expect, test } from "vitest";
-import { serializableFn } from "..";
+import { serializableFn, globalName } from "..";
 
 describe("server-runtime", () => {
 	describe("serializableFn", () => {
@@ -40,8 +40,28 @@ describe("server-runtime", () => {
 				id: "",
 			});
 
-			// This is broken since currently we only do typeof var === 'object'
-			expect(isSolenoidFunction(fn)).toBe(true);
+			expect(isSolenoidFunction(fn.toJSON())).toBe(true);
+		});
+
+		test("toJSON can be parsed back into a config", () => {
+			const fn = serializableFn({
+				fn: () => () => null,
+				closure: (): [] => [],
+				id: "",
+			});
+
+			const fnJSON = fn.toJSON();
+
+			const reparsed = JSON.parse(JSON.stringify(fnJSON));
+
+			expect(reparsed).toStrictEqual(fnJSON);
+			expect(isSolenoidFunction(reparsed)).toBe(true);
+		});
+	});
+
+	describe("globalName", () => {
+		test("result contains id", () => {
+			expect(globalName({ id: "foo" }).id).toEqual("foo");
 		});
 	});
 });
