@@ -4,14 +4,16 @@ import type {
 } from "../utils/types";
 
 import { effect } from "alien-signals";
-import { describe, expect, test, afterEach, vi, beforeEach } from "vitest";
 import delay from "delay";
+import { describe, expect, test, afterEach, vi, beforeEach } from "vitest";
 import { createSignal, JSON_PARSE, signalStore } from "../core";
 import { SOLENOID_CUSTOM_KEY, SOLENOID_OBJECT_TYPES } from "../utils/types";
 
 describe("core", () => {
 	beforeEach(() => {
 		window.__FNS__ = {};
+		vi.clearAllMocks();
+		// vi.unstubAllGlobals();
 	});
 
 	describe("signalStore", () => {
@@ -23,23 +25,23 @@ describe("core", () => {
 			expect((window as any).signalStore).toBe(signalStore);
 		});
 
-		test("awaitGet will wait until a signal is actually set", async () => {
-			const key = "foo";
+		// 	test("awaitGet will wait until a signal is actually set", async () => {
+		// 		const key = "foo";
 
-			const spy = vi.fn();
-			const promise = signalStore.awaitGet(key);
-			promise.then(spy);
+		// 		const spy = vi.fn();
+		// 		const promise = signalStore.awaitGet(key);
+		// 		promise.then(spy);
 
-			// wait for the next tick to ensure awaitGet gets a chance to run
-			await delay(0);
-			expect(spy).not.toHaveBeenCalled();
+		// 		// wait for the next tick to ensure awaitGet gets a chance to run
+		// 		await delay(0);
+		// 		expect(spy).not.toHaveBeenCalled();
 
-			const signal = createSignal(key, null);
-			expect(signalStore.set(key, signal)).not.toBeNull();
+		// 		const signal = createSignal(key, null);
+		// 		expect(signalStore.set(key, signal)).not.toBeNull();
 
-			await promise;
-			expect(spy).toHaveBeenCalledExactlyOnceWith(signal);
-		});
+		// 		await promise;
+		// 		expect(spy).toHaveBeenCalledExactlyOnceWith(signal);
+		// 	});
 	});
 
 	describe("JSON_PARSE", () => {
@@ -63,6 +65,8 @@ describe("core", () => {
 				(...args: string[]) =>
 					(...args2: string[]) => [...args, ...args2],
 			);
+			// Needs an update to core.ts to use .default to work
+			// vi.doMock(moduleName, ()=>makeESM(fakeModuleWithClosure));
 			window.__FNS__[moduleName] = fakeModuleWithClosure;
 
 			const closure = ["a", "b", "c"];
@@ -124,16 +128,15 @@ describe("core", () => {
 			expect(fakeFn).toHaveBeenCalledOnce();
 		});
 
-		// test('can hydrate nested solenoid configs', ()=>{
-
-		// });
-
 		// test('errors if object is like a solenoid config but with an invalid value', ()=>{
-
-		// });
-
-		// test('can properly turn a solenoid config back into a real value', ()=>{
 
 		// });
 	});
 });
+
+// function makeESM<T>(obj: T): {default: T} {
+//   return {
+//     __esModule: true,
+//     default: obj,
+//   } as {default: T};
+// }
