@@ -1,5 +1,5 @@
-import { effect, effectScope } from "alien-signals";
-import { JSON_PARSE, createSignal, type Signal, signalStore } from "./core";
+import { effect, effectScope, signal } from "alien-signals";
+import { JSON_PARSE } from "./core";
 
 export class ForEach extends HTMLElement {
 	/*
@@ -59,7 +59,7 @@ export class ForEach extends HTMLElement {
 			throw new Error('for-each must have a "values" attribute');
 		}
 
-		this.values = await JSON_PARSE(values);
+		this.values = await JSON_PARSE(values, this);
 
 		requestAnimationFrame(() => this.render());
 	}
@@ -96,20 +96,20 @@ export class ForEach extends HTMLElement {
 
 customElements.define("for-each", ForEach);
 
-type Index = Signal<number> | null | undefined;
+type Index = ReturnType<typeof signal<number>> | null | undefined;
 
 export class ListItem extends HTMLElement {
-	static observedAttributes = ["initial-index", "name"];
+	static observedAttributes = ["initial-index"];
 
 	private cleanUp: null | (() => void) = null;
 	private hasRemovedTemplate: boolean = false;
-	protected index: Index;
+	protected __index: Index;
 	isConnected = true;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
 
-		this.__initializeIndexSignal();
+		this.__reinitializeIndexSignal();
 		requestAnimationFrame(() => this.render());
 	}
 
@@ -122,13 +122,9 @@ export class ListItem extends HTMLElement {
 		this.__removeTemplate();
 	}
 
-	__initializeIndexSignal(): asserts this is this & {
-		index: NonNullable<ListItem["index"]>;
+	__reinitializeIndexSignal(): asserts this is this & {
+		__index: NonNullable<Index>;
 	} {
-		const name = this.getAttribute("name");
-		if (!name) {
-			throw new Error('list-item did not receive a "name"');
-		}
 		const initialIndex = this.getAttribute("initial-index");
 		const initialIndexNum = Number(initialIndex);
 		if (isNaN(initialIndexNum)) {
@@ -136,8 +132,16 @@ export class ListItem extends HTMLElement {
 				`list-item received an invalid "initial-index": ${initialIndex}`,
 			);
 		}
-		this.index = createSignal(name, initialIndexNum);
-		signalStore.set(name, this.index);
+		// This doesn't need to go to the signal store since it's associated with the element's position.
+		this.__index = signal(initialIndexNum);
+	}
+
+	__initializeIndexSignal(): asserts this is this & {
+		__index: NonNullable<Index>;
+	} {
+		if (this.__index == null) {
+			this.__reinitializeIndexSignal();
+		}
 	}
 
 	__removeTemplate() {
@@ -162,10 +166,14 @@ export class ListItem extends HTMLElement {
 	}
 
 	__setIndex(num: number) {
-		if (this.index == null) {
-			this.__initializeIndexSignal();
-		}
-		this.index!(num);
+		this.__initializeIndexSignal();
+		this.__index(num);
+	}
+
+	get index(): NonNullable<Index> {
+		this.__initializeIndexSignal();
+
+		return this.__index;
 	}
 }
 

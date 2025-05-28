@@ -55,7 +55,9 @@ describe("core", () => {
 			] as any[];
 			const jsonStrs = values.map((v) => JSON.stringify(v)) as string[];
 
-			const results = await Promise.all(jsonStrs.map((str) => JSON_PARSE(str)));
+			const results = await Promise.all(
+				jsonStrs.map((str) => JSON_PARSE(str, null as unknown as HTMLElement)),
+			);
 			expect(results).toStrictEqual(values);
 		});
 
@@ -79,7 +81,10 @@ describe("core", () => {
 			};
 
 			const stringifiedConfig = JSON.stringify(config);
-			const res = await JSON_PARSE(stringifiedConfig);
+			const res = await JSON_PARSE(
+				stringifiedConfig,
+				null as unknown as HTMLElement,
+			);
 
 			expect(res).toBeTypeOf("function");
 
@@ -100,7 +105,10 @@ describe("core", () => {
 			};
 
 			const stringifiedConfig = JSON.stringify(config);
-			const signal = await JSON_PARSE(stringifiedConfig);
+			const signal = await JSON_PARSE(
+				stringifiedConfig,
+				null as unknown as HTMLElement,
+			);
 
 			expect(signal).toBeTypeOf("function");
 			expect(signal()).toBe(expectedValue1);
