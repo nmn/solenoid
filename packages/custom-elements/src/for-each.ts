@@ -51,6 +51,7 @@ export class ForEach extends HTMLElement {
 	isConnected = true;
 	private cleanUp?: () => void;
 	private values?: () => [];
+	protected dummyItem?: Readonly<ListItem>;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -65,11 +66,13 @@ export class ForEach extends HTMLElement {
 	}
 
 	render() {
+		this.createDummyItem();
 		this.cleanUp?.();
 		this.cleanUp = effectScope(() => {
 			effect(() => {
-				// TODO: Properly watch values, update indices
 				const values = this.values?.() ?? [];
+				console.log("got new values", values);
+
 				while (this.children.length > values.length) {
 					this.removeChild(this.lastChild!);
 				}
@@ -81,9 +84,14 @@ export class ForEach extends HTMLElement {
 					},
 				);
 
-				// while (this.children.length < values.length) {
-				// Need to do some cloning...
-				// }
+				while (this.children.length < values.length) {
+					console.log("appending new list item");
+					const newItem = this.createNewListItem();
+					// We don't setAttribute('initial-index', num.toString())
+					// because we don't want the extra compute to re-process back to number
+					newItem.__setIndex(this.children.length);
+					this.appendChild(newItem);
+				}
 			});
 		});
 	}
@@ -91,6 +99,29 @@ export class ForEach extends HTMLElement {
 	disconnectedCallback() {
 		this.cleanUp?.();
 		this.isConnected = false;
+	}
+
+	createDummyItem(): Readonly<ListItem> {
+		if (this.dummyItem == null) {
+			console.log("creating a dummy item");
+			const template = this.children[0] as HTMLTemplateElement;
+			if (
+				process.env.NODE_ENV === "development" &&
+				!(template instanceof HTMLTemplateElement)
+			) {
+				console.error("The first child of ", this, "was not <template>");
+			}
+
+			this.removeChild(template);
+
+			this.dummyItem = document.createElement("list-item") as ListItem;
+			this.dummyItem.append(template);
+		}
+		return this.dummyItem;
+	}
+
+	createNewListItem(): ListItem {
+		return this.createDummyItem().cloneNode(true) as ListItem;
 	}
 }
 
@@ -109,7 +140,7 @@ export class ListItem extends HTMLElement {
 	async connectedCallback() {
 		if (!this.isConnected) return;
 
-		this.__reinitializeIndexSignal();
+		this.__initializeIndexSignal();
 		requestAnimationFrame(() => this.render());
 	}
 
@@ -121,26 +152,19 @@ export class ListItem extends HTMLElement {
 	render() {
 		this.__removeTemplate();
 	}
-
-	__reinitializeIndexSignal(): asserts this is this & {
-		__index: NonNullable<Index>;
-	} {
-		const initialIndex = this.getAttribute("initial-index");
-		const initialIndexNum = Number(initialIndex);
-		if (isNaN(initialIndexNum)) {
-			throw new Error(
-				`list-item received an invalid "initial-index": ${initialIndex}`,
-			);
-		}
-		// This doesn't need to go to the signal store since it's associated with the element's position.
-		this.__index = signal(initialIndexNum);
-	}
-
 	__initializeIndexSignal(): asserts this is this & {
 		__index: NonNullable<Index>;
 	} {
 		if (this.__index == null) {
-			this.__reinitializeIndexSignal();
+			const initialIndex = this.getAttribute("initial-index");
+			const initialIndexNum = Number(initialIndex);
+			if (isNaN(initialIndexNum)) {
+				throw new Error(
+					`list-item received an invalid "initial-index": ${initialIndex}`,
+				);
+			}
+			// This doesn't need to go to the signal store since it's associated with the element's position.
+			this.__index = signal(initialIndexNum);
 		}
 	}
 
@@ -166,7 +190,11 @@ export class ListItem extends HTMLElement {
 	}
 
 	__setIndex(num: number) {
-		this.__initializeIndexSignal();
+		if (this.__index == null) {
+			this.__index = signal(num);
+			return;
+		}
+
 		this.__index(num);
 	}
 
