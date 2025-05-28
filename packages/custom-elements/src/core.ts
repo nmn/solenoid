@@ -12,7 +12,7 @@ declare const window: {
 	signalStore: SignalStore;
 };
 
-const hydrateJSON = async (value: unknown) => {
+const hydrateJSON = async (value: unknown): Promise<unknown> => {
 	if (Array.isArray(value)) {
 		return await Promise.all(value.map(hydrateJSON));
 	}
@@ -61,8 +61,8 @@ export function createSignal<T>(id: string, initialValue: T): Signal<T> {
 }
 
 class SignalStore {
-	store = new Map<string, Signal<any>>();
-	resolvers = new Map<string, (value: any) => void>();
+	private store = new Map<string, Signal<any>>();
+	private resolvers = new Map<string, (value: any) => void>();
 
 	get(id: string) {
 		return this.store.get(id);
@@ -97,7 +97,7 @@ class SignalStore {
 	async awaitGet(id: string): Promise<Signal<any>> {
 		const signal = this.store.get(id);
 		if (signal == null) {
-			const { promise, resolve, reject } = Promise.withResolvers();
+			const { promise, resolve, reject: _reject } = Promise.withResolvers();
 			this.resolvers.set(id, resolve);
 			return (await promise) as any;
 		}

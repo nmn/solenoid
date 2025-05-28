@@ -37,10 +37,9 @@ export class SignalText extends HTMLElement {
   */
 	static observedAttributes = ["value"];
 
-	private value: () => unknown;
-	isConnected = true;
 	private cleanUp: null | (() => void) = null;
-	private _observer: MutationObserver;
+	private value?: () => unknown;
+	isConnected = true;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -63,11 +62,11 @@ export class SignalText extends HTMLElement {
 		}
 	}
 
-	render(value?: unknown) {
+	render() {
 		this.cleanUp?.();
 		const stopScope = effectScope(() => {
 			effect(() => {
-				const latestText = this.value();
+				const latestText = this.value!();
 				this.innerText = String(latestText);
 			});
 		});
@@ -97,10 +96,10 @@ export class SignalAttrs extends HTMLElement {
   */
 	static observedAttributes = ["value"];
 
-	private value: () => { [key: string]: unknown };
-	isConnected = true;
-	private cleanUp: null | (() => void) = null;
 	private abortController: AbortController = new AbortController();
+	private cleanUp: null | (() => void) = null;
+	private value?: () => { [key: string]: unknown };
+	isConnected = true;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -120,12 +119,12 @@ export class SignalAttrs extends HTMLElement {
 		}
 	}
 
-	render(value?: unknown) {
+	render() {
 		// There should only ever be a single child element
 		const childElement = this.children[0] as HTMLElement;
 		const stopScope = effectScope(() => {
 			effect(() => {
-				const latestAttrs = this.value();
+				const latestAttrs = this.value!();
 				// unbind previous event listeners and re-attach them
 				this.abortController.abort();
 				this.abortController = new AbortController();
@@ -140,7 +139,7 @@ export class SignalAttrs extends HTMLElement {
 						);
 					} else if (key in childElement) {
 						// Property exists, set it directly
-						childElement[key] = latestAttrs[key];
+						(childElement as any)[key] = latestAttrs[key];
 					} else {
 						// Property doesn't exist, fall back to setAttribute
 						childElement.setAttribute(key, String(latestAttrs[key]));
@@ -162,10 +161,10 @@ customElements.define("signal-attrs", SignalAttrs);
 export class ShowWhen extends HTMLElement {
 	static observedAttributes = ["condition"];
 
-	private condition: () => unknown;
-	isConnected = true;
+	private condition?: () => unknown;
 	private cleanUp: null | (() => void) = null;
 	private templateHTML: string | null = null;
+	isConnected = true;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -188,13 +187,13 @@ export class ShowWhen extends HTMLElement {
 		}
 	}
 
-	render(value?: unknown) {
+	render() {
 		this.cleanUp && this.cleanUp();
 		this.templateHTML ??= this.innerHTML;
 		const stopScope = effectScope(() => {
 			effect(() => {
-				if (this.condition()) {
-					this.innerHTML = this.templateHTML;
+				if (this.condition!()) {
+					this.innerHTML = this.templateHTML!;
 				} else {
 					this.templateHTML = this.innerHTML.trim() ?? this.templateHTML;
 					this.innerHTML = "";
