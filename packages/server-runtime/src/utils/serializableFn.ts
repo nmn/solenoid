@@ -3,7 +3,7 @@ import {
 	type SolenoidFunctionConfig,
 	SOLENOID_CUSTOM_KEY,
 	SOLENOID_OBJECT_TYPES,
-} from "@solenoid/custom-elements/dist/utils/types";
+} from "@solenoid/custom-elements/lib/utils/types";
 
 type SerializableFn<
 	C extends any[] = any[],
