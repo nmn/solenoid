@@ -1,25 +1,33 @@
 import { signal } from "alien-signals";
 import {
+	isSolenoidContext,
 	isSolenoidFunction,
 	isSolenoidSignal,
 	type Signal,
 } from "./utils/types";
+
+export type { Signal };
 
 declare const window: {
 	__FNS__: Record<string, (...args: any[]) => any>;
 	signalStore: SignalStore;
 };
 
-const hydrateJSON = async (value: unknown): Promise<unknown> => {
+const hydrateJSON = async (
+	value: unknown,
+	callsite: Element,
+): Promise<unknown> => {
 	if (Array.isArray(value)) {
-		return await Promise.all(value.map(hydrateJSON));
+		return await Promise.all(value.map((v) => hydrateJSON(v, callsite)));
 	}
 
 	if (typeof value === "object" && value !== null) {
 		if (isSolenoidFunction(value)) {
 			const fnObj = value;
 			const fnPromise = window.__FNS__[fnObj.module] ?? import(fnObj.module);
-			const closurePromises = Promise.all(fnObj.closure.map(hydrateJSON));
+			const closurePromises = Promise.all(
+				fnObj.closure.map((v) => hydrateJSON(v, callsite)),
+			);
 
 			const [fn, closure] = await Promise.all([fnPromise, closurePromises]);
 			return (...args: any[]) => fn(...closure)(...args);
@@ -28,9 +36,28 @@ const hydrateJSON = async (value: unknown): Promise<unknown> => {
 			const signalObj = value;
 			return await signalStore.awaitGet(signalObj.id);
 		}
+		if (isSolenoidContext(value)) {
+			const { selector, key } = value;
+			const closest = callsite.closest(selector);
+			if (closest == null) {
+				throw new Error(
+					`Could not find closest element with selector: ${selector}`,
+				);
+			}
+			if (!(key in closest)) {
+				throw new Error(
+					`Could not find key ${key} in element matching selector ${selector}`,
+				);
+			}
+
+			// This is so that we can have non-stringified JS values ready from up the tree, i.e. __value
+			const closestVal = (closest as any)[key];
+
+			return await hydrateJSON(closestVal, closest);
+		}
 
 		const patchPromises = Object.entries(value).map(async ([key, val]) => {
-			const patch = await hydrateJSON(val);
+			const patch = await hydrateJSON(val, callsite);
 			return [key, patch];
 		});
 		const patchedEntries = await Promise.all(patchPromises);
@@ -43,14 +70,17 @@ const hydrateJSON = async (value: unknown): Promise<unknown> => {
 // Ideally, it would be nice to ensure that JSON parse
 // returned the same reference for any nested array or object
 const cache = new Map<string, any>();
-export const JSON_PARSE = async (value: string) => {
+export const JSON_PARSE = async (value: string, callsite: HTMLElement) => {
 	const cached = cache.get(value);
 	if (cached) {
 		return cached;
 	}
 	const parsed = JSON.parse(value);
-	const hydratedValue = await hydrateJSON(parsed);
-	cache.set(value, hydratedValue);
+	const hydratedValue = await hydrateJSON(parsed, callsite);
+
+	if (!isSolenoidContext) {
+		cache.set(value, hydratedValue);
+	}
 	return hydratedValue;
 };
 
