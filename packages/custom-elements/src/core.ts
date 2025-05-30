@@ -58,15 +58,38 @@ export function createSignal<T>(id: string, initialValue: T): Signal<T> {
 	return signal(initialValue);
 }
 
+type Resolver = (value: Signal<any>) => void;
+
 class SignalStore {
 	private store = new Map<string, Signal<any>>();
-	private resolvers = new Map<string, (value: any) => void>();
+	private resolvers = new Map<string, Array<Resolver>>();
+
+	private setResolver(id: string, value: (v: Signal<any>) => void) {
+		if (!this.resolvers.has(id)) {
+			this.resolvers.set(id, []);
+		}
+
+		this.resolvers.get(id)!.push(value);
+	}
+
+	private async resolveAllFor(id: string, signal: Signal<any>): Promise<void> {
+		const resolvers = this.resolvers.get(id) ?? [];
+		this.resolvers.set(id, []);
+
+		const results = await Promise.allSettled(resolvers.map((fn) => fn(signal)));
+
+		if (process.env.NODE_ENV === "development") {
+			const errs = results.filter((v) => v.status !== "fulfilled");
+			console.error(`${errs.length} resolvers did not resolve for id: ${id}`);
+		}
+	}
 
 	get(id: string) {
 		return this.store.get(id);
 	}
 	set(id: string, value: Signal<any>) {
-		return this.store.set(id, value);
+		this.store.set(id, value);
+		this.resolveAllFor(id, value);
 	}
 	delete(id: string) {
 		return this.store.delete(id);
@@ -95,8 +118,8 @@ class SignalStore {
 	async awaitGet(id: string): Promise<Signal<any>> {
 		const signal = this.store.get(id);
 		if (signal == null) {
-			const { promise, resolve, reject: _reject } = Promise.withResolvers();
-			this.resolvers.set(id, resolve);
+			const { promise, resolve, reject } = Promise.withResolvers<Signal<any>>();
+			this.setResolver(id, resolve);
 			return (await promise) as any;
 		}
 		return signal;
