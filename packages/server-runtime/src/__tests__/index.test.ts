@@ -1,4 +1,4 @@
-import { isSolenoidFunction } from "@solenoid/custom-elements/dist/utils/types";
+import { isSolenoidFunction } from "@solenoid/custom-elements/lib/utils/types";
 import { describe, expect, test } from "vitest";
 import { serializableFn, globalName } from "..";
 
