@@ -5,6 +5,8 @@ import {
 	type Signal,
 } from "./utils/types";
 
+export type {Signal};
+
 declare const window: {
 	__FNS__: Record<string, (...args: any[]) => any>;
 	signalStore: SignalStore;
