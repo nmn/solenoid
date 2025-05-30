@@ -1,3 +1,9 @@
+/**
+ * Not very well-documented yet, but this follows the syntax set by Typescript/Babel
+ * https://www.typescriptlang.org/docs/handbook/jsx.html#the-jsx-namespace
+ * https://babeljs.io/docs/babel-plugin-transform-react-jsx#importsource
+ **/
+
 import type { HtmlTags } from "html-tags";
 import type { SolenoidExclusiveHtmlTags } from "@solenoid/custom-elements/lib/html-tags";
 type Tag = SolenoidExclusiveHtmlTags | HtmlTags;
