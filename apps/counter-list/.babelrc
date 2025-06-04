@@ -1,0 +1,7 @@
+{
+  "plugins": [
+    ["@babel/plugin-syntax-typescript", { "isTSX": true }],
+    "@solenoid/babel-plugin",
+    ["@babel/plugin-transform-typescript", { "isTSX": true }]
+  ]
+}

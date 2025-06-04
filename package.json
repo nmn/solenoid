@@ -1,7 +1,7 @@
 {
 	"name": "solenoid",
 	"private": true,
-	"workspaces": ["tools/*", "packages/*"],
+	"workspaces": ["packages/*", "apps/*"],
 	"scripts": {
 		"build": "bun run --filter '*' build",
 		"format": "biome format --write .",
@@ -11,6 +11,8 @@
 		"lint-staged": "lint-staged"
 	},
 	"devDependencies": {
+		"@babel/cli": "^7.27.2",
+		"@babel/preset-typescript": "^7.27.1",
 		"@biomejs/biome": "^1.9.4",
 		"@testing-library/dom": "^10.4.0",
 		"@testing-library/user-event": "^14.6.1",

@@ -2,7 +2,7 @@ import {
 	SOLENOID_CUSTOM_KEY,
 	SOLENOID_OBJECT_TYPES,
 	type SolenoidGlobalNameConfig,
-} from "@solenoid/custom-elements/lib/utils/types";
+} from "@solenoid/custom-elements/src/utils/types";
 
 type Options = {
 	id: SolenoidGlobalNameConfig["id"];

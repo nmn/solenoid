@@ -1,0 +1,21 @@
+{
+	"name": "@solenoid/counter-list",
+	"version": "0.0.0",
+	"description": "Example app showing a long list of counters",
+	"private": "true",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"repository": "https://github.com/nmn/solenoid",
+	"license": "MIT",
+	"scripts": {
+		"build": "babel src/*.tsx --out-dir lib/ --extensions '.js,.jsx,.ts,.tsx'",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"@solenoid/custom-elements": "*",
+		"@solenoid/server-runtime": "*"
+	},
+	"devDependencies": {
+		"@solenoid/babel-plugin": "*"
+	}
+}

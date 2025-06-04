@@ -12,6 +12,7 @@
 	},
 	"license": "MIT",
 	"scripts": {
+		"prebuild": "find ./src/helpers -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/helprs/$(basename {} .ts).js --target node --no-bundle' \\;",
 		"build": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
 		"test": "vitest"
 	},

@@ -2,6 +2,9 @@
 	"extends": "@tsconfig/bun/tsconfig.json",
 	"compilerOptions": {
 		"noEmit": true,
+		"jsx": "react",
+		"jsxFactory": "createElement",
+		"jsxFragmentFactory": "Fragment",
 		"paths": {
 			"@solenoid/custom-elements/lib/*": ["./packages/custom-elements/src/*"]
 		}
