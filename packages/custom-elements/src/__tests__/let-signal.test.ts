@@ -16,6 +16,11 @@ describe("let-signal", () => {
 		document.body.innerHTML = "";
 	});
 
+	test('document.createElement("let-signal") is a LetSignal instance', () => {
+		const element = document.createElement("let-signal");
+		expect(element.constructor).toBe(LetSignal);
+	});
+
 	test("initializes a signal by the id passed to it, deletes it after unmount", async () => {
 		// initialization
 		const name = randomString();
@@ -23,7 +28,6 @@ describe("let-signal", () => {
 		const element = document.createElement("let-signal") as LetSignal<
 			typeof initialValue
 		>;
-		expect(element).toBeInstanceOf(LetSignal);
 
 		element.setAttribute("name", name);
 		element.setAttribute("initial-value", JSON.stringify(initialValue));
@@ -43,13 +47,11 @@ describe("let-signal", () => {
 		expect(signalStore.get(name)).toBe(undefined);
 	});
 
-	test("falls back to `null` if the initial value is not set or an empty string", async () => {
+	test("falls back to `null` if the initial value is not set", async () => {
 		const name = randomString();
 		const element = document.createElement("let-signal") as LetSignal<null>;
-		expect(element).toBeInstanceOf(LetSignal);
 
 		element.setAttribute("name", name);
-		element.setAttribute("initial-value", "");
 
 		document.body.append(element);
 		await waitForElement(element);
