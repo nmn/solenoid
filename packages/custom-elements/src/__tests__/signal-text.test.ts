@@ -1,12 +1,13 @@
 // Instantiate custom elements
 import "..";
 import {
+	awaitRepaint,
 	awaitUpdateSignal,
+	createMockFunctionJSON,
 	createMockSignalJSON,
-	waitForElementToBeRemoved,
 } from "./helpers";
 import { SignalText } from "../signal-html";
-import { describe, expect, test, beforeEach } from "vitest";
+import { describe, expect, test, beforeEach, vi } from "vitest";
 import { signalStore } from "../core";
 
 describe("signal-text", () => {
@@ -28,7 +29,9 @@ describe("signal-text", () => {
 		const [signal, configJSON] = createMockSignalJSON(initialText);
 		element.setAttribute("value", configJSON);
 		await element.connectedCallback();
+		await awaitRepaint();
 
+		expect(element.innerText).toEqual(initialText);
 		expect((element as any).value).toBe(signal);
 
 		const nextText = "testing for update";
@@ -38,5 +41,42 @@ describe("signal-text", () => {
 		expect(element.innerText).toEqual(nextText);
 	});
 
-	test("will still work on non-signal JSONs of functions", async () => {});
+	test("will still work on non-signal JSONs of functions", async () => {
+		const element = new SignalText();
+
+		const initialText = "foobar";
+		const [signalLike, configJSON] = createMockFunctionJSON(
+			(_?: string) => initialText,
+		);
+		element.setAttribute("value", configJSON);
+
+		await element.connectedCallback();
+		await awaitRepaint();
+		signalLike.mockClear();
+
+		expect(element.innerText).toBe(initialText);
+		await (element as any).value();
+		expect(signalLike).toHaveBeenCalledTimes(1);
+	});
+
+	test("unsubscribes to a signal after disconnection", async () => {
+		const element = new SignalText();
+
+		const initialText = "foobar";
+		const [signal, configJSON] = createMockSignalJSON(initialText);
+		element.setAttribute("value", configJSON);
+		await element.connectedCallback();
+		await awaitRepaint();
+
+		expect(element.innerText).toEqual(initialText);
+		expect((element as any).value).toBe(signal);
+
+		element.disconnectedCallback();
+
+		const nextText = "testing for update";
+		await awaitUpdateSignal(signal, nextText);
+
+		expect(signal()).toBe(nextText);
+		expect(element.innerText).toEqual(initialText);
+	});
 });

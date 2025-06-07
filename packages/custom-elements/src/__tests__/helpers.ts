@@ -1,11 +1,13 @@
 import {
-	SOLENOID_OBJECT_TYPES,
-	SOLENOID_CUSTOM_KEY,
+	type AnyFunction,
 	type SolenoidSignalConfig,
 	type Signal,
+	SOLENOID_OBJECT_TYPES,
+	SOLENOID_CUSTOM_KEY,
+	type SolenoidFunctionConfig,
 } from "../utils/types";
 import { waitFor } from "@testing-library/dom";
-import { expect } from "vitest";
+import { expect, vi, type Mock } from "vitest";
 import { createSignal, signalStore } from "../core";
 import { effect, effectScope } from "alien-signals";
 
@@ -19,6 +21,29 @@ export function randomString() {
 
 export function waitForElementToBeRemoved(element: HTMLElement) {
 	return waitFor(() => expect(element.parentNode).toBeNull());
+}
+
+export function createMockFunctionJSON<T extends () => unknown>(
+	fn: T,
+): [Mock<T>, string] {
+	let id: string;
+	do {
+		id = randomString();
+	} while (window.__FNS__[id] != null);
+
+	const config: SolenoidFunctionConfig = {
+		[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function,
+		id,
+		module: id,
+		closure: [],
+		toJSON: undefined as unknown as SolenoidFunctionConfig["toJSON"],
+	};
+
+	const mockFn = vi.fn(fn);
+
+	window.__FNS__[id] = () => mockFn;
+
+	return [mockFn, JSON.stringify(config)];
 }
 
 export function createMockSignalJSON<T>(initialValue: T): [Signal<T>, string] {
