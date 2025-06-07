@@ -7,6 +7,7 @@ type T_SOLENOID_SYMBOL = typeof SOLENOID_CUSTOM_KEY_SYMBOL;
 export const SOLENOID_CUSTOM_KEY: T_SOLENOID_SYMBOL = "__type" as any;
 
 export enum SOLENOID_OBJECT_TYPES {
+	Context = "$$CONTEXT",
 	Function = "$$FUNCTION",
 	Signal = "$$SIGNAL",
 	Global = "$$GLOBAL",
@@ -32,9 +33,16 @@ export type SolenoidGlobalNameConfig = {
 	id: string;
 };
 
+export type SolenoidContextConfig = {
+	[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Context;
+	selector: string;
+	key: string;
+};
+
 export type SolenoidConfigObject =
 	| SolenoidSignalConfig
-	| SolenoidFunctionConfig;
+	| SolenoidFunctionConfig
+	| SolenoidContextConfig;
 
 // ---------------------------------------------------
 
@@ -69,5 +77,16 @@ export function isSolenoidSignal(
 		typeof value === "object" &&
 		SOLENOID_CUSTOM_KEY in value &&
 		value[SOLENOID_CUSTOM_KEY] === SOLENOID_OBJECT_TYPES.Signal
+	);
+}
+
+export function isSolenoidContext(
+	value: unknown,
+): value is SolenoidContextConfig {
+	return (
+		value != null &&
+		typeof value === "object" &&
+		SOLENOID_CUSTOM_KEY in value &&
+		value[SOLENOID_CUSTOM_KEY] === SOLENOID_OBJECT_TYPES.Context
 	);
 }

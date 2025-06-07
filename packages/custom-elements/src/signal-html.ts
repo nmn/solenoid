@@ -1,5 +1,6 @@
 import { effect, effectScope } from "alien-signals";
 import { JSON_PARSE } from "./core";
+import "./for-each";
 
 export class SignalText extends HTMLElement {
 	/*
@@ -47,7 +48,8 @@ export class SignalText extends HTMLElement {
 			throw new Error("signal-text must have a value attribute");
 		}
 		this.isConnected = true;
-		const parsedValue = await JSON_PARSE(value);
+		const that = this;
+		const parsedValue = await JSON_PARSE(value, that);
 		if (!this.isConnected) {
 			return;
 		}
@@ -107,7 +109,8 @@ export class SignalAttrs extends HTMLElement {
 			throw new Error("signal-text must have a value attribute");
 		}
 		this.isConnected = true;
-		const parsedValue = await JSON_PARSE(value);
+		const that = this;
+		const parsedValue = await JSON_PARSE(value, that);
 
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
@@ -172,7 +175,8 @@ export class ShowWhen extends HTMLElement {
 			throw new Error("signal-text must have a condition attribute");
 		}
 		this.isConnected = true;
-		const parsedValue = await JSON_PARSE(condition);
+		const that = this;
+		const parsedValue = await JSON_PARSE(condition, that);
 		if (!this.isConnected) {
 			return;
 		}
