@@ -7,7 +7,7 @@ import {
 	createMockSignalJSON,
 } from "./helpers";
 import { SignalText } from "../signal-html";
-import { describe, expect, test, beforeEach, vi } from "vitest";
+import { describe, expect, test, beforeEach } from "vitest";
 import { signalStore } from "../core";
 
 describe("signal-text", () => {
@@ -72,9 +72,11 @@ describe("signal-text", () => {
 		expect((element as any).value).toBe(signal);
 
 		element.disconnectedCallback();
+		signal.mockClear();
 
 		const nextText = "testing for update";
 		await awaitUpdateSignal(signal, nextText);
+		expect(signal).not.toHaveBeenCalled();
 
 		expect(signal()).toBe(nextText);
 		expect(element.innerText).toEqual(initialText);
