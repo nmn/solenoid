@@ -1,5 +1,4 @@
 import {
-	type AnyFunction,
 	type SolenoidSignalConfig,
 	type Signal,
 	SOLENOID_OBJECT_TYPES,
@@ -46,7 +45,9 @@ export function createMockFunctionJSON<T extends () => unknown>(
 	return [mockFn, JSON.stringify(config)];
 }
 
-export function createMockSignalJSON<T>(initialValue: T): [Signal<T>, string] {
+export function createMockSignalJSON<T>(
+	initialValue: T,
+): [Signal<T> & Mock<Signal<T>>, string] {
 	let id: string;
 	do {
 		id = randomString();
@@ -57,9 +58,10 @@ export function createMockSignalJSON<T>(initialValue: T): [Signal<T>, string] {
 		id,
 	};
 
-	const signal = createSignal(id, initialValue);
+	const signal = vi.fn(createSignal(id, initialValue)) as Signal<T> &
+		Mock<Signal<T>>;
 
-	signalStore.set(id, signal);
+	signalStore.set(id, signal as Signal<T>);
 
 	return [signal, JSON.stringify(config)];
 }
@@ -69,9 +71,13 @@ export async function awaitRepaint() {
 }
 
 export async function awaitUpdateSignal<T>(
-	signal: Signal<T>,
+	signal: Signal<T> | Mock<Signal<T>>,
 	nextVal: T,
 ): Promise<void> {
+	if (vi.isMockFunction(signal)) {
+		signal = signal.getMockImplementation() as Signal<T>;
+	}
+
 	const { promise, resolve } = Promise.withResolvers();
 
 	let initialized = false;
