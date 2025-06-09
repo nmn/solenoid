@@ -44,4 +44,25 @@ describe("show-when", () => {
 
 		expect(Array.from(element.children)).toContainEqual(childElement);
 	});
+
+	test("unsubscribes to any signals upon disconnection", async () => {
+		const element = document.createElement("show-when") as ShowWhen;
+
+		const childElement = document.createElement("div");
+		childElement.append("signal test for show when");
+
+		const [signal, configJSON] = createMockSignalJSON(true);
+		element.setAttribute("condition", configJSON);
+		element.append(childElement);
+
+		await element.connectedCallback();
+		await awaitRepaint();
+
+		expect(Array.from(element.children)).toContainEqual(childElement);
+
+		element.disconnectedCallback();
+		await awaitUpdateSignal(signal, false);
+
+		expect(Array.from(element.children)).toContainEqual(childElement);
+	});
 });
