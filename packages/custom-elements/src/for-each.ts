@@ -9,6 +9,7 @@ export class ForEach extends HTMLElement {
   <for-each
     values={counterValues}
   >
+		<template><div style="display: block;">...</div></template> <!-- this is a template that exists to create more list-items -->
     <list-item initial-index="0">
       <div style="display: block;">
         <signal-text value='{"__type":"$$CONTEXT"}'>
@@ -71,12 +72,13 @@ export class ForEach extends HTMLElement {
 		this.cleanUp = effectScope(() => {
 			effect(() => {
 				const values = this.values?.() ?? [];
-				console.log("got new values", values);
 
+				// if the array has shrank, drop list items -- their disconnectedCallbacks are to be handled by the DOM
 				while (this.children.length > values.length) {
 					this.removeChild(this.lastChild!);
 				}
 
+				// notify all list items of their new index
 				Array.prototype.forEach.call(
 					this.children,
 					(child: ListItem, index: number) => {
@@ -84,8 +86,8 @@ export class ForEach extends HTMLElement {
 					},
 				);
 
+				// if the array has grown, create new list items
 				while (this.children.length < values.length) {
-					console.log("appending new list item");
 					const newItem = this.createNewListItem();
 					// We don't setAttribute('initial-index', num.toString())
 					// because we don't want the extra compute to re-process back to number
@@ -103,14 +105,7 @@ export class ForEach extends HTMLElement {
 
 	createDummyItem(): Readonly<ListItem> {
 		if (this.dummyItem == null) {
-			console.log("creating a dummy item");
 			const template = this.children[0] as HTMLTemplateElement;
-			if (
-				process.env.NODE_ENV === "development" &&
-				!(template instanceof HTMLTemplateElement)
-			) {
-				console.error("The first child of ", this, "was not <template>");
-			}
 
 			this.removeChild(template);
 
@@ -127,6 +122,7 @@ export class ForEach extends HTMLElement {
 
 customElements.define("for-each", ForEach);
 
+// List item signals don't belong in the signal store -- they are to be managed by the for-each.
 type Index = ReturnType<typeof signal<number>> | null | undefined;
 
 export class ListItem extends HTMLElement {
@@ -152,6 +148,7 @@ export class ListItem extends HTMLElement {
 	render() {
 		this.__removeTemplate();
 	}
+
 	__initializeIndexSignal(): asserts this is this & {
 		__index: NonNullable<Index>;
 	} {
@@ -174,15 +171,6 @@ export class ListItem extends HTMLElement {
 		}
 
 		const template = this.children[0] as HTMLTemplateElement;
-
-		if (
-			process.env.NODE_ENV === "development" &&
-			(this.children.length !== 1 || !(template instanceof HTMLTemplateElement))
-		) {
-			console.error(
-				`list-item received incorrect children. It must be a single <template>.`,
-			);
-		}
 
 		this.innerHTML = template.innerHTML;
 
