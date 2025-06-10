@@ -12,6 +12,8 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^1.9.4",
+		"@testing-library/dom": "^10.4.0",
+		"@testing-library/user-event": "^14.6.1",
 		"@tsconfig/bun": "^1.0.7",
 		"@types/bun": "^1.2.3",
 		"delay": "^6.0.0",

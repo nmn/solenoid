@@ -154,6 +154,7 @@ export class SignalAttrs extends HTMLElement {
 
 	disconnectedCallback() {
 		this.cleanUp && this.cleanUp();
+		this.abortController.abort();
 		this.isConnected = false;
 	}
 }
