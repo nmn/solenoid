@@ -96,45 +96,51 @@
     is Odd!
   </show-when>
 
+	<!--
+		const counterValues = createSignal([-4,1,6]); // Render 3 counters next to each other, each with a different initial value & state
+		
+		const decrIndex = (index)=>{
+			const nextCounterValues = [...counterValues()];
+			nextCounterValues[index]--;
+			counterValues(nextCounterValues);
+		};
+		
+		const incrIndex = (index)=>{
+			const nextCounterValues = [...counterValues()];
+			nextCounterValues[index]++;
+			counterValues(nextCounterValues);
+		};
 
-	<!-- Unfinished -- for-each example -->
-		<!--
-			const counterValues = createSignal([-4,1,6]); // Render 3 counters next to each other, each with a different initial value & state
-			
-			const decrIndex = (index)=>{
-				const nextCounterValues = [...counterValues()];
-				nextCounterValues[index]--;
-				counterValues(nextCounterValues);
-			};
-			
-			const incrIndex = (index)=>{
-				const nextCounterValues = [...counterValues()];
-				nextCounterValues[index]++;
-				counterValues(nextCounterValues);
-			};
+		const pushArray = ()=>{
+			counterValues([...counterValues(), Math.floor(Math.random() * (100 - 1 + 1) + 1)])
+		};
 
-			const pushArray = ()=>{
-				counterValues([...counterValues(), Math.floor(Math.random() * (100 - 1 + 1) + 1)])
-			};
+		const popArray = ()=>{
+			const newCounterValues = [...counterValues()];
+			newCounterValues.pop();
+			counterValues(newCounterValues);
+		};
 
-			const popArray = ()=>{
-				const newCounterValues = [...counterValues()];
-				newCounterValues.pop();
-				counterValues(newCounterValues);
-			};
+		const unshiftArray = ()=>{
+			counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
+		};
 
-			const unshiftArray = ()=>{
-				counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
-			};
+		const shiftArray = ()=>{
+			const newCounterValues = [...counterValues()];
+			newCounterValues.shift();
+			counterValues(newCounterValues);
+		};
 
-			const shiftArray = ()=>{
-				const newCounterValues = [...counterValues()];
-				newCounterValues.shift();
-				counterValues(newCounterValues);
-			};
-
-			return (
-				<div id="for-each-example">
+		return (
+			<div id="for-each-example">
+				<span>For-each example:</span>
+				<div style="display: flex; flex-direction: row; gap: 30px;">
+					<div id="for-each-example-buttons" style="display: flex; flex-direction: column;">
+						<button onClick={pushArray}> Push random </button>
+						<button onClick={popArray}> Pop </button>
+						<button onClick={unshiftArray}> Unshift random </button>
+						<button onClick={shiftArray}> Shift </button>
+					</div>
 					<for-each
 						values={counterValues}
 						map={(counterValue, index)=>(
@@ -145,69 +151,93 @@
 							</div>
 						)}
 					/>
-					<div id="for-each-example-buttons" style="display:flex;flex-direction:column;">
-						<button onClick={pushArray}> Push random </button>
-						<button onClick={popArray}> Pop </button>
-						<button onClick={unshiftArray}> Unshift random </button>
-						<button onClick={shiftArray}> Shift </button>
-					</div>
 				</div>
-			);
-		-->
-		<script>
+			</div>
+		);
+	-->
+	<script id="for-each-example-js">
 
-			window.__FNS__.decrIndex = ($c1)=>($p1)=>{
-				const nextCounterValues = [...$c1()];
-				nextCounterValues[$p1]--;
-				$c1(nextCounterValues);
-			}
+		window.__FNS__.decrIndex = ($c1)=>($p1)=>{
+			const nextCounterValues = [...$c1()];
+			nextCounterValues[$p1]--;
+			$c1(nextCounterValues);
+		}
 
-			window.__FNS__.incrIndex = ($c1)=>($p1)=>{
-				const nextCounterValues = [...$c1()];
-				nextCounterValues[$p1]++;
-				$c1(nextCounterValues);
-			}
+		window.__FNS__.incrIndex = ($c1)=>($p1)=>{
+			const nextCounterValues = [...$c1()];
+			nextCounterValues[$p1]++;
+			$c1(nextCounterValues);
+		}
 
-			window.__FNS__.pushArray = (counterValues)=>()=>{
-				counterValues([...counterValues(), Math.floor(Math.random() * (100 - 1 + 1) + 1)])
-			};
+		window.__FNS__.pushArray = (counterValues)=>()=>{
+			counterValues([...counterValues(), Math.floor(Math.random() * (100 - 1 + 1) + 1)])
+		};
 
-			window.__FNS__.pushArrayAttrs = (counterValues)=>()=>({onClick: window.__FNS__.pushArray(counterValues)});
+		window.__FNS__.pushArrayAttrs = (counterValues)=>()=>({onClick: window.__FNS__.pushArray(counterValues)});
 
-			window.__FNS__.popArray = (counterValues)=>()=>{
-				console.log('popping');
-				const newCounterValues = [...counterValues()];
-				newCounterValues.pop();
-				counterValues(newCounterValues);
-			};
+		window.__FNS__.popArray = (counterValues)=>()=>{
+			console.log('popping');
+			const newCounterValues = [...counterValues()];
+			newCounterValues.pop();
+			counterValues(newCounterValues);
+		};
 
-			window.__FNS__.popArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.popArray($c1)});
+		window.__FNS__.popArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.popArray($c1)});
 
-			window.__FNS__.unshiftArray = (counterValues)=>()=>{
-				console.log('unshifting');
-				counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
-			};
+		window.__FNS__.unshiftArray = (counterValues)=>()=>{
+			console.log('unshifting');
+			counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
+		};
 
-			window.__FNS__.unshiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.unshiftArray($c1)});
+		window.__FNS__.unshiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.unshiftArray($c1)});
 
-			window.__FNS__.shiftArray = (counterValues)=>()=>{
-				console.log('shifting');
-				const newCounterValues = [...counterValues()];
-				newCounterValues.shift();
-				counterValues(newCounterValues);
-			};
+		window.__FNS__.shiftArray = (counterValues)=>()=>{
+			console.log('shifting');
+			const newCounterValues = [...counterValues()];
+			newCounterValues.shift();
+			counterValues(newCounterValues);
+		};
 
-			window.__FNS__.shiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.shiftArray($c1)});
+		window.__FNS__.shiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.shiftArray($c1)});
 
-			// this is a function that creates all attributes for the first button
-			window.__FNS__.__counterValues__map__button1_attrs= (decrIndex, counterValues, index) => () => ({
-				onClick: ()=>decrIndex(index()),
-			});
+		// this is a function that creates all attributes for the 0th child
+		// i.e. .map(()=><list-item><div/><button/></list-item>) -- <div/> is the 0th, <button/> is the 1th
+		window.__FNS__.__counterValues__map__el0_attrs= (decrIndex, counterValues, index) => () => ({
+			onClick: ()=>decrIndex(index()),
+		});
 
-			window.__FNS__.__getValueFromIndex = (signal, index)=>()=>signal()[index()];
-		</script>
-		<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
-		<div id="for-each-example">
+		window.__FNS__.__counterValues__map__el2_attrs= (decrIndex, counterValues, index) => () => ({
+			onClick: ()=>decrIndex(index()),
+		});
+
+		window.__FNS__.__getValueFromIndex = (signal, index)=>()=>signal()[index()];
+	</script>
+	<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
+	<div id="for-each-example">
+		<span>For-each example:</span>
+		<div style="display: flex; flex-direction: row; gap: 30px;">
+			<div id="for-each-example-buttons" style="display: flex; flex-direction: column;">
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"pushArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Push random </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"popArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Pop </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"unshiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Unshift random </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"shiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Shift </button>
+				</signal-attrs>
+			</div>
 			<for-each
 				values='{"__type":"$$SIGNAL","id":"counterValues"}'
 			>
@@ -216,7 +246,7 @@
 						<signal-attrs
 							value='{
 								"__type": "$$FUNCTION",
-								"module": "__counterValues__map__button1_attrs",
+								"module": "__counterValues__map__el0_attrs",
 								"closure": [
 									{
 										"__type": "$$FUNCTION",
@@ -252,7 +282,7 @@
 						<signal-attrs
 							value='{
 								"__type": "$$FUNCTION",
-								"module": "__counterValues__map__button1_attrs",
+								"module": "__counterValues__map__el2_attrs",
 								"closure": [
 									{
 										"__type": "$$FUNCTION",
@@ -283,7 +313,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__button1_attrs",
+									"module": "__counterValues__map__el0_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -319,7 +349,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__button1_attrs",
+									"module": "__counterValues__map__el2_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -351,7 +381,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__button1_attrs",
+									"module": "__counterValues__map__el0_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -387,7 +417,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__button1_attrs",
+									"module": "__counterValues__map__el2_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -419,7 +449,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__button1_attrs",
+									"module": "__counterValues__map__el0_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -455,7 +485,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__button1_attrs",
+									"module": "__counterValues__map__el2_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -482,28 +512,6 @@
 					</template>
 				</list-item>
 			</for-each>
-			<br/>
-			<div id="for-each-example-buttons" style="display:flex;flex-direction:column;">
-				<signal-attrs
-					value='{"__type":"$$FUNCTION","module":"pushArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
-				>
-					<button> Push random </button>
-				</signal-attrs>
-				<signal-attrs
-					value='{"__type":"$$FUNCTION","module":"popArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
-				>
-					<button> Pop </button>
-				</signal-attrs>
-				<signal-attrs
-					value='{"__type":"$$FUNCTION","module":"unshiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
-				>
-					<button> Unshift random </button>
-				</signal-attrs>
-				<signal-attrs
-					value='{"__type":"$$FUNCTION","module":"shiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
-				>
-					<button> Shift </button>
-				</signal-attrs>
-			</div>
 		</div>
+	</div>
 </html>
