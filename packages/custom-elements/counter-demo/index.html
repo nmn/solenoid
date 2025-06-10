@@ -144,7 +144,8 @@
 					<for-each
 						values={counterValues}
 						map={(counterValue, index)=>(
-							<div style={{display: 'block'}}>
+							<div style="display: block;">
+								<span>Index: {index()}</span>
 								<button onClick={()=>decrIndex(index())}>-</button>
 								{counterValue()}
 								<button onClick={()=>incrIndex(index())}>-</button>
@@ -156,7 +157,6 @@
 		);
 	-->
 	<script id="for-each-example-js">
-
 		window.__FNS__.decrIndex = ($c1)=>($p1)=>{
 			const nextCounterValues = [...$c1()];
 			nextCounterValues[$p1]--;
@@ -176,7 +176,6 @@
 		window.__FNS__.pushArrayAttrs = (counterValues)=>()=>({onClick: window.__FNS__.pushArray(counterValues)});
 
 		window.__FNS__.popArray = (counterValues)=>()=>{
-			console.log('popping');
 			const newCounterValues = [...counterValues()];
 			newCounterValues.pop();
 			counterValues(newCounterValues);
@@ -185,14 +184,12 @@
 		window.__FNS__.popArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.popArray($c1)});
 
 		window.__FNS__.unshiftArray = (counterValues)=>()=>{
-			console.log('unshifting');
 			counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
 		};
 
 		window.__FNS__.unshiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.unshiftArray($c1)});
 
 		window.__FNS__.shiftArray = (counterValues)=>()=>{
-			console.log('shifting');
 			const newCounterValues = [...counterValues()];
 			newCounterValues.shift();
 			counterValues(newCounterValues);
@@ -202,11 +199,11 @@
 
 		// this is a function that creates all attributes for the 0th child
 		// i.e. .map(()=><list-item><div/><button/></list-item>) -- <div/> is the 0th, <button/> is the 1th
-		window.__FNS__.__counterValues__map__el0_attrs= (decrIndex, counterValues, index) => () => ({
+		window.__FNS__.__counterValues__map__el0_el1_attrs= (decrIndex, counterValues, index) => () => ({
 			onClick: ()=>decrIndex(index()),
 		});
 
-		window.__FNS__.__counterValues__map__el2_attrs= (decrIndex, counterValues, index) => () => ({
+		window.__FNS__.__counterValues__map__el2_el0_attrs= (decrIndex, counterValues, index) => () => ({
 			onClick: ()=>decrIndex(index()),
 		});
 
@@ -243,10 +240,11 @@
 			>
 				<template> <!-- This template node exists to create more list items as the array expands. -->
 					<div style="display: block;">
+						<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
 						<signal-attrs
 							value='{
 								"__type": "$$FUNCTION",
-								"module": "__counterValues__map__el0_attrs",
+								"module": "__counterValues__map__el0_el1_attrs",
 								"closure": [
 									{
 										"__type": "$$FUNCTION",
@@ -282,7 +280,7 @@
 						<signal-attrs
 							value='{
 								"__type": "$$FUNCTION",
-								"module": "__counterValues__map__el2_attrs",
+								"module": "__counterValues__map__el0_el3_attrs",
 								"closure": [
 									{
 										"__type": "$$FUNCTION",
@@ -310,10 +308,11 @@
 				<list-item initial-index="0">
 					<template>
 						<div style="display: block;">
+							<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__el0_attrs",
+									"module": "__counterValues__map__el0_el1_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -349,7 +348,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__el2_attrs",
+									"module": "__counterValues__map__el2_el0_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -378,10 +377,11 @@
 				<list-item initial-index="1">
 					<template>
 						<div style="display: block;">
+							<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__el0_attrs",
+									"module": "__counterValues__map__el0_el1_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -417,7 +417,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__el2_attrs",
+									"module": "__counterValues__map__el2_el0_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -446,10 +446,11 @@
 				<list-item initial-index="2">
 					<template>
 						<div style="display: block;">
+							<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__el0_attrs",
+									"module": "__counterValues__map__el0_el1_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
@@ -485,7 +486,7 @@
 							<signal-attrs
 								value='{
 									"__type": "$$FUNCTION",
-									"module": "__counterValues__map__el2_attrs",
+									"module": "__counterValues__map__el2_el0_attrs",
 									"closure": [
 										{
 											"__type": "$$FUNCTION",
