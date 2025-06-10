@@ -1,6 +1,9 @@
 import { effect, effectScope, signal } from "alien-signals";
 import { JSON_PARSE } from "./core";
 
+// This is to disregard counting any templates at the start of the for-each
+const NON_LIST_ELEMENT_LENGTH = 1;
+
 export class ForEach extends HTMLElement {
 	/*
   JSX:
@@ -67,35 +70,43 @@ export class ForEach extends HTMLElement {
 	}
 
 	render() {
-		this.createDummyItem();
 		this.cleanUp?.();
 		this.cleanUp = effectScope(() => {
 			effect(() => {
 				const values = this.values?.() ?? [];
 
 				// if the array has shrank, drop list items -- their disconnectedCallbacks are to be handled by the DOM
-				while (this.children.length > values.length) {
+				while (this.getElementsLength() > values.length) {
 					this.removeChild(this.lastChild!);
 				}
 
 				// notify all list items of their new index
-				Array.prototype.forEach.call(
-					this.children,
-					(child: ListItem, index: number) => {
-						child.__setIndex(index);
-					},
-				);
+				this.forEach((child: ListItem, index: number) => {
+					child.__setIndex(index);
+				});
 
-				// if the array has grown, create new list items
-				while (this.children.length < values.length) {
+				// if the array has grown, create new list items from the template
+				while (this.getElementsLength() < values.length) {
 					const newItem = this.createNewListItem();
 					// We don't setAttribute('initial-index', num.toString())
 					// because we don't want the extra compute to re-process back to number
-					newItem.__setIndex(this.children.length);
+					newItem.__setIndex(this.getElementsLength());
 					this.appendChild(newItem);
 				}
 			});
 		});
+	}
+
+	private forEach(cb: (child: ListItem, index: number) => void): void {
+		for (let i = NON_LIST_ELEMENT_LENGTH; i < this.children.length; i++) {
+			const listItem = this.children[i] as ListItem;
+			cb(listItem, i - NON_LIST_ELEMENT_LENGTH);
+		}
+	}
+
+	private getElementsLength(): number {
+		// We render a template node first, then all elements, so we need to disregard the first child in the elements length.
+		return this.children.length - NON_LIST_ELEMENT_LENGTH;
 	}
 
 	disconnectedCallback() {
@@ -107,10 +118,8 @@ export class ForEach extends HTMLElement {
 		if (this.dummyItem == null) {
 			const template = this.children[0] as HTMLTemplateElement;
 
-			this.removeChild(template);
-
 			this.dummyItem = document.createElement("list-item") as ListItem;
-			this.dummyItem.append(template);
+			this.dummyItem.append(template.cloneNode(true));
 		}
 		return this.dummyItem;
 	}
