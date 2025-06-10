@@ -81,7 +81,7 @@ export class ForEach extends HTMLElement {
 				}
 
 				// notify all list items of their new index
-				this.forEach((child: ListItem, index: number) => {
+				this.forEachListItem((child: ListItem, index: number) => {
 					child.__setIndex(index);
 				});
 
@@ -97,7 +97,7 @@ export class ForEach extends HTMLElement {
 		});
 	}
 
-	private forEach(cb: (child: ListItem, index: number) => void): void {
+	private forEachListItem(cb: (child: ListItem, index: number) => void): void {
 		for (let i = NON_LIST_ELEMENT_LENGTH; i < this.children.length; i++) {
 			const listItem = this.children[i] as ListItem;
 			cb(listItem, i - NON_LIST_ELEMENT_LENGTH);
@@ -114,18 +114,19 @@ export class ForEach extends HTMLElement {
 		this.isConnected = false;
 	}
 
-	createDummyItem(): Readonly<ListItem> {
+	createNewListItem(): ListItem {
 		if (this.dummyItem == null) {
 			const template = this.children[0] as HTMLTemplateElement;
-
-			this.dummyItem = document.createElement("list-item") as ListItem;
-			this.dummyItem.append(template.cloneNode(true));
+			const dummyItem = template.content.children[0].cloneNode(
+				true,
+			) as ListItem;
+			const fragment = document.createDocumentFragment();
+			fragment.append(dummyItem);
+			customElements.upgrade(dummyItem);
+			this.dummyItem = dummyItem;
 		}
-		return this.dummyItem;
-	}
 
-	createNewListItem(): ListItem {
-		return this.createDummyItem().cloneNode(true) as ListItem;
+		return this.dummyItem.cloneNode(true) as ListItem;
 	}
 }
 

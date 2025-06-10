@@ -239,71 +239,75 @@
 				values='{"__type":"$$SIGNAL","id":"counterValues"}'
 			>
 				<template><!-- This template node exists to create more list items as the array expands. -->
-					<div style="display: block;">
-						<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
-						<signal-attrs
-							value='{
-								"__type": "$$FUNCTION",
-								"module": "__counterValues__map__el0_el1_attrs",
-								"closure": [
-									{
+					<list-item>
+						<template>
+							<div style="display: block;">
+								<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
+								<signal-attrs
+									value='{
 										"__type": "$$FUNCTION",
-										"module": "decrIndex",
+										"module": "__counterValues__map__el0_el1_attrs",
 										"closure": [
-											{"__type":"$$SIGNAL","id":"counterValues"}
-										]
-									},
-									{
-										"__type": "$$FUNCTION",
-										"module": "__getValueFromIndex",
-										"closure": [
-											{"__type":"$$SIGNAL","id":"counterValues"},
+											{
+												"__type": "$$FUNCTION",
+												"module": "decrIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"}
+												]
+											},
+											{
+												"__type": "$$FUNCTION",
+												"module": "__getValueFromIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"},
+													{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+												]
+											},
 											{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
 										]
-									},
-									{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
-								]
-							}'
-						>
-							<button>-</button>
-						</signal-attrs>
-						<signal-text value='{
-							"__type": "$$FUNCTION",
-							"module": "__getValueFromIndex",
-							"closure": [
-								{"__type":"$$SIGNAL","id":"counterValues"},
-								{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
-							]
-						}'>
-						-4
-						</signal-text>
-						<signal-attrs
-							value='{
-								"__type": "$$FUNCTION",
-								"module": "__counterValues__map__el2_el0_attrs",
-								"closure": [
-									{
+									}'
+								>
+									<button>-</button>
+								</signal-attrs>
+								<signal-text value='{
+									"__type": "$$FUNCTION",
+									"module": "__getValueFromIndex",
+									"closure": [
+										{"__type":"$$SIGNAL","id":"counterValues"},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'>
+								-4
+								</signal-text>
+								<signal-attrs
+									value='{
 										"__type": "$$FUNCTION",
-										"module": "incrIndex",
+										"module": "__counterValues__map__el2_el0_attrs",
 										"closure": [
-											{"__type":"$$SIGNAL","id":"counterValues"}
-										]
-									},
-									{
-										"__type": "$$FUNCTION",
-										"module": "__getValueFromIndex",
-										"closure": [
-											{"__type":"$$SIGNAL","id":"counterValues"},
+											{
+												"__type": "$$FUNCTION",
+												"module": "incrIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"}
+												]
+											},
+											{
+												"__type": "$$FUNCTION",
+												"module": "__getValueFromIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"},
+													{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+												]
+											},
 											{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
 										]
-									},
-									{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
-								]
-							}'
-						>
-							<button>+</button>
-						</signal-attrs>
-					</div>
+									}'
+								>
+									<button>+</button>
+								</signal-attrs>
+							</div>
+						</template>
+					</list-item>
 				</template>
 				<list-item initial-index="0">
 					<template>
