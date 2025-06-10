@@ -190,10 +190,12 @@ export class ListItem extends HTMLElement {
 	__setIndex(num: number) {
 		if (this.__index == null) {
 			this.__index = signal(num);
-			return;
+		} else {
+			this.__index(num);
 		}
 
-		this.__index(num);
+		// All internal values should be able to be recreated with HTML alone
+		this.setAttribute("initial-index", num.toString());
 	}
 
 	get index(): NonNullable<Index> {
