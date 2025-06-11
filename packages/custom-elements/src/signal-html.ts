@@ -35,7 +35,7 @@ export class SignalText extends HTMLElement {
     </await-suspense>
   </div>
   */
-	static observedAttributes = ["value"];
+	static observedAttributes = ["set-immediate", "value"];
 
 	private cleanUp: null | (() => void) = null;
 	private value?: () => unknown;
@@ -57,7 +57,11 @@ export class SignalText extends HTMLElement {
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
 
-			requestAnimationFrame(() => this.render());
+			if (this.getAttribute("set-immediate") !== "true") {
+				requestAnimationFrame(() => this.render());
+			} else {
+				this.render();
+			}
 		} else {
 			this.isConnected = false;
 		}
@@ -95,7 +99,7 @@ export class SignalAttrs extends HTMLElement {
     </div>
   </signal-attrs>
   */
-	static observedAttributes = ["value"];
+	static observedAttributes = ["set-immediate", "value"];
 
 	private abortController: AbortController = new AbortController();
 	private cleanUp: null | (() => void) = null;
@@ -115,7 +119,11 @@ export class SignalAttrs extends HTMLElement {
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
 
-			requestAnimationFrame(() => this.render());
+			if (this.getAttribute("set-immediate") !== "true") {
+				requestAnimationFrame(() => this.render());
+			} else {
+				this.render();
+			}
 		} else {
 			this.isConnected = false;
 		}
