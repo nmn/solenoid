@@ -182,7 +182,10 @@ export class ListItem extends HTMLElement {
 
 		const template = this.children[0] as HTMLTemplateElement;
 
-		this.innerHTML = template.innerHTML;
+		const fragmentClone = template.content.cloneNode(true);
+		customElements.upgrade(fragmentClone);
+
+		this.append(fragmentClone);
 
 		this.hasRemovedTemplate = true;
 	}
