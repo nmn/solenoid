@@ -56,6 +56,7 @@ export class ForEach extends HTMLElement {
 	private cleanUp?: () => void;
 	private values?: () => [];
 	protected dummyItem?: Readonly<ListItem>;
+	private fragment: DocumentFragment = document.createDocumentFragment();
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -120,8 +121,7 @@ export class ForEach extends HTMLElement {
 			const dummyItem = template.content.children[0].cloneNode(
 				true,
 			) as ListItem;
-			const fragment = document.createDocumentFragment();
-			fragment.append(dummyItem);
+			this.fragment.append(dummyItem);
 			customElements.upgrade(dummyItem);
 			this.dummyItem = dummyItem;
 		}
