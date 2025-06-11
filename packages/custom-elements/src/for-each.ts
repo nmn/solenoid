@@ -86,14 +86,15 @@ export class ForEach extends HTMLElement {
 					child.__setIndex(index);
 				});
 
-				// if the array has grown, create new list items from the template
-				while (this.getElementsLength() < values.length) {
-					const newItem = this.createNewListItem();
-					// We don't setAttribute('initial-index', num.toString())
-					// because we don't want the extra compute to re-process back to number
-					newItem.__setIndex(this.getElementsLength());
-					this.appendChild(newItem);
+				const newElements = document.createDocumentFragment();
+				const len = this.getElementsLength();
+
+				for (let i = 0; len + i < values.length; i++) {
+					const newItem = this.createNewListItem(len + i);
+					newElements.appendChild(newItem);
 				}
+
+				this.appendChild(newElements);
 			});
 		});
 	}
@@ -115,7 +116,7 @@ export class ForEach extends HTMLElement {
 		this.isConnected = false;
 	}
 
-	createNewListItem(): ListItem {
+	createNewListItem(index: number): ListItem {
 		if (this.dummyItem == null) {
 			const template = this.children[0] as HTMLTemplateElement;
 			const dummyItem = template.content.children[0].cloneNode(
@@ -126,7 +127,9 @@ export class ForEach extends HTMLElement {
 			this.dummyItem = dummyItem;
 		}
 
-		return this.dummyItem.cloneNode(true) as ListItem;
+		const node = this.dummyItem.cloneNode(true) as ListItem;
+		node.__setIndex(index);
+		return node;
 	}
 }
 
