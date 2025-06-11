@@ -132,6 +132,8 @@ export class ForEach extends HTMLElement {
 
 customElements.define("for-each", ForEach);
 
+const STATIC_NON_CHILD_LENGTH = 1;
+
 // List item signals don't belong in the signal store -- they are to be managed by the for-each.
 type Index = ReturnType<typeof signal<number>> | null | undefined;
 
@@ -177,6 +179,10 @@ export class ListItem extends HTMLElement {
 
 	__removeTemplate() {
 		if (this.hasRemovedTemplate) {
+			return;
+		}
+
+		if (this.children.length > STATIC_NON_CHILD_LENGTH) {
 			return;
 		}
 
