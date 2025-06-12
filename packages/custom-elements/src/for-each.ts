@@ -77,8 +77,15 @@ export class ForEach extends HTMLElement {
 				const values = this.values?.() ?? [];
 
 				// if the array has shrank, drop list items -- their disconnectedCallbacks are to be handled by the DOM
-				while (this.getElementsLength() > values.length) {
-					this.removeChild(this.lastChild!);
+				if (this.getElementsLength() > values.length) {
+					const removeCount = this.getElementsLength() - values.length;
+					const newChildren = Array.from(this.children);
+
+					for (let i = 0; i < removeCount; i++) {
+						newChildren.pop();
+					}
+
+					this.replaceChildren(...newChildren);
 				}
 
 				// notify all list items of their new index
