@@ -7,7 +7,9 @@
 	"repository": "https://github.com/nmn/solenoid",
 	"license": "MIT",
 	"scripts": {
-		"build": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build": "bunx concurrently \"bun run build-types\" \"bun run build-code\"",
+		"build-code": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-types": "bun run ./build-types.ts",
 		"test": "vitest"
 	},
 	"dependencies": {},
