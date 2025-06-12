@@ -1,5 +1,6 @@
 import { effect, effectScope } from "alien-signals";
 import { JSON_PARSE } from "./core";
+import "./for-each";
 
 export class SignalText extends HTMLElement {
 	/*
@@ -34,7 +35,7 @@ export class SignalText extends HTMLElement {
     </await-suspense>
   </div>
   */
-	static observedAttributes = ["value"];
+	static observedAttributes = ["set-immediate", "value"];
 
 	private cleanUp: null | (() => void) = null;
 	private value?: () => unknown;
@@ -47,7 +48,8 @@ export class SignalText extends HTMLElement {
 			throw new Error("signal-text must have a value attribute");
 		}
 		this.isConnected = true;
-		const parsedValue = await JSON_PARSE(value);
+		const that = this;
+		const parsedValue = await JSON_PARSE(value, that);
 		if (!this.isConnected) {
 			return;
 		}
@@ -55,7 +57,11 @@ export class SignalText extends HTMLElement {
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
 
-			requestAnimationFrame(() => this.render());
+			if (this.getAttribute("set-immediate") !== "true") {
+				requestAnimationFrame(() => this.render());
+			} else {
+				this.render();
+			}
 		} else {
 			this.isConnected = false;
 		}
@@ -93,7 +99,7 @@ export class SignalAttrs extends HTMLElement {
     </div>
   </signal-attrs>
   */
-	static observedAttributes = ["value"];
+	static observedAttributes = ["set-immediate", "value"];
 
 	private abortController: AbortController = new AbortController();
 	private cleanUp: null | (() => void) = null;
@@ -107,12 +113,17 @@ export class SignalAttrs extends HTMLElement {
 			throw new Error("signal-text must have a value attribute");
 		}
 		this.isConnected = true;
-		const parsedValue = await JSON_PARSE(value);
+		const that = this;
+		const parsedValue = await JSON_PARSE(value, that);
 
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
 
-			requestAnimationFrame(() => this.render());
+			if (this.getAttribute("set-immediate") !== "true") {
+				requestAnimationFrame(() => this.render());
+			} else {
+				this.render();
+			}
 		} else {
 			this.isConnected = false;
 		}
@@ -173,7 +184,8 @@ export class ShowWhen extends HTMLElement {
 			throw new Error("signal-text must have a condition attribute");
 		}
 		this.isConnected = true;
-		const parsedValue = await JSON_PARSE(condition);
+		const that = this;
+		const parsedValue = await JSON_PARSE(condition, that);
 		if (!this.isConnected) {
 			return;
 		}

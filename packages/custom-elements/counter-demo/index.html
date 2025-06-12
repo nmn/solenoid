@@ -1,40 +1,598 @@
 <html>
-    <head>
-        <title>
-            Counter Test
-        </title>
-        <script src="../lib/index.js"></script>
-    </head>
-    <let-signal name="count" initial-value="0"></let-signal>
-    <script>
-      window.__FNS__.decr = ($c1) => () => $c1($c1() - 1);
-      window.__FNS__.decAttrs = ($c1) => () => ({onClick: $c1});
-    </script>
-    <signal-attrs value='{"__type":"$$FUNCTION","module":"decAttrs","closure":[{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
-        <button>-</button>
-    </signal-attrs>
-    <signal-text value='{"__type":"$$SIGNAL","id":"count"}'>
-        0
-    </signal-text>
-    <script>
-      window.__FNS__.incr = ($c1) => () => $c1($c1() + 1);
-      window.__FNS__.attrs = ($c1) => () => ({onClick: $c1});
-      window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
-      window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
-    </script>
-    <signal-attrs value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'>
-        <button>+</button>
-    </signal-attrs>
-    <br/>
-    <br/>
-    <script>
-      window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
-      window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
-    </script>
-    <show-when condition='{"__type":"$$FUNCTION","module":"whenEven","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>
-        is Even!
-    </show-when>
-    <show-when condition='{"__type":"$$FUNCTION","module":"whenOdd","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>
-        is Odd!
-    </show-when>
+  <head>
+    <title>Counter Test</title>
+    <script src="../lib/index.js"></script>
+  </head>
+  <script>
+    function initDark() {
+      try {
+        DarkReader.enable({
+          brightness: 100,
+          contrast: 90,
+          sepia: 10,
+        });
+        console.log("Dark mode enabled");
+      } catch (e) {
+        console.warn("Error enabling DarkReader:", e);
+      }
+    }
+  </script>
+  <script
+    onload="initDark()"
+    src="https://cdnjs.cloudflare.com/ajax/libs/darkreader/4.9.100/darkreader.js"
+    integrity="sha512-VrShkHBDBKBOP8ZSAhsgf035s7Go+x3ClNZCmqDBtJNsVIq9Nd88KVUQPF+RyoveDW+KLv2Nz/Ya4+eqHm16tg=="
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  ></script>
+
+  <!--
+		Example with let-signal, signal-attrs, signal-text
+
+		const count = signal(0);
+		const decr = ()=>count(count()-1);
+		const incr = ()=>count(count()+1);
+
+		return (
+			<>
+				<button onClick={decr}>-</button>
+				{count()}
+				<button onClick={incr}>+</button>
+			</>
+		);
+	-->
+  <let-signal name="count" initial-value="0"></let-signal>
+  <script>
+    window.__FNS__.decr = ($c1) => () => $c1($c1() - 1);
+    window.__FNS__.decAttrs = ($c1) => () => ({ onClick: $c1 });
+  </script>
+  <signal-attrs
+    value='{"__type":"$$FUNCTION","module":"decAttrs","closure":[{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'
+  >
+    <button>-</button>
+  </signal-attrs>
+  <signal-text value='{"__type":"$$SIGNAL","id":"count"}'> 0 </signal-text>
+  <script>
+    window.__FNS__.incr = ($c1) => () => $c1($c1() + 1);
+    window.__FNS__.attrs = ($c1) => () => ({ onClick: $c1 });
+  </script>
+  <signal-attrs
+    value='{"__type":"$$FUNCTION","module":"attrs","closure":[{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}]}'
+  >
+    <button>+</button>
+  </signal-attrs>
+
+
+  <br />
+  <br />
+
+
+	<!--
+		Example with show-when
+
+		const whenEven = ()=>count()%2 === 0;
+		const whenOdd = ()=>count()%2 === 1;
+
+		if (whenEven()) {
+			return "is Even!";
+		}
+		else if (whenOdd()) {
+			return "is Odd!";
+		}
+
+		return null;
+	-->
+  <script>
+    window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0;
+    window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0;
+  </script>
+  <show-when
+    condition='{"__type":"$$FUNCTION","module":"whenEven","closure":[{"__type":"$$SIGNAL","id":"count"}]}'
+  >
+    is Even!
+  </show-when>
+  <show-when
+    condition='{"__type":"$$FUNCTION","module":"whenOdd","closure":[{"__type":"$$SIGNAL","id":"count"}]}'
+  >
+    is Odd!
+  </show-when>
+
+	<!--
+		const counterValues = createSignal([-4,1,6]); // Render 3 counters next to each other, each with a different initial value & state
+		
+		const rand = ()=>Math.floor(Math.random() * (100 - 1 + 1) + 1);
+
+		const decrIndex = (index)=>{
+			const nextCounterValues = [...counterValues()];
+			nextCounterValues[index]--;
+			counterValues(nextCounterValues);
+		};
+		
+		const incrIndex = (index)=>{
+			const nextCounterValues = [...counterValues()];
+			nextCounterValues[index]++;
+			counterValues(nextCounterValues);
+		};
+
+		const pushArray = ()=>{
+			const newVal = rand();
+			console.log('pushing');
+			counterValues([...counterValues(), newVal])
+		};
+
+		const popArray = ()=>{
+			const newCounterValues = [...counterValues()];
+			newCounterValues.pop();
+			counterValues(newCounterValues);
+		};
+
+		const unshiftArray = ()=>{
+			counterValues([rand(), ...counterValues()])
+		};
+
+		const shiftArray = ()=>{
+			const newCounterValues = [...counterValues()];
+			newCounterValues.shift();
+			counterValues(newCounterValues);
+		};
+
+		const push100Array = ()=>{
+			console.log('pushing 100');
+			const newCounterValues = [...counterValues()];
+			for (let i = 0; i < 100; i++) {
+				newCounterValues.push(rand());
+			}
+
+			counterValues(newCounterValues);
+		};
+
+		const pop100Array = ()=>{
+			console.log('popping 100');
+
+			const newCounterValues = [...counterValues()];
+			for (let i = 0; i < 100; i++) {
+				newCounterValues.pop();
+			}
+
+			counterValues(newCounterValues);
+		}
+
+		return (
+			<div id="for-each-example">
+				<span>For-each example:</span>
+				<div style="display: flex; flex-direction: row; gap: 30px;">
+					<div id="for-each-example-buttons" style="display: flex; flex-direction: column;">
+						<button onClick={pushArray}> Push random </button>
+						<button onClick={popArray}> Pop </button>
+						<button onClick={unshiftArray}> Unshift random </button>
+						<button onClick={shiftArray}> Shift </button>
+						<button onClick={push100Array}> Push 100 </button>
+						<button onClick={pop100Array}> Pop 100 </button>
+					</div>
+					<for-each
+						values={counterValues}
+						map={(counterValue, index)=>(
+							<div style="display: block;">
+								<span>Index: {index()}</span>
+								<button onClick={()=>decrIndex(index())}>-</button>
+								{counterValue()}
+								<button onClick={()=>incrIndex(index())}>-</button>
+							</div>
+						)}
+					/>
+				</div>
+			</div>
+		);
+	-->
+	<script id="for-each-example-js">
+		const rand = ()=>Math.floor(Math.random() * (100 - 1 + 1) + 1);
+
+		window.__FNS__.decrIndex = ($c1)=>($p1)=>{
+			const nextCounterValues = [...$c1()];
+			nextCounterValues[$p1]--;
+			$c1(nextCounterValues);
+		}
+
+		window.__FNS__.incrIndex = ($c1)=>($p1)=>{
+			const nextCounterValues = [...$c1()];
+			nextCounterValues[$p1]++;
+			$c1(nextCounterValues);
+		}
+
+		window.__FNS__.pushArray = (counterValues)=>()=>{
+			const newVal = rand();
+			console.log('pushing', newVal);
+			counterValues([...counterValues(), newVal])
+		};
+
+		window.__FNS__.pushArrayAttrs = (counterValues)=>()=>({onClick: window.__FNS__.pushArray(counterValues)});
+
+		window.__FNS__.popArray = (counterValues)=>()=>{
+			const newCounterValues = [...counterValues()];
+			newCounterValues.pop();
+			counterValues(newCounterValues);
+		};
+
+		window.__FNS__.popArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.popArray($c1)});
+
+		window.__FNS__.unshiftArray = (counterValues)=>()=>{
+			counterValues([rand(), ...counterValues()])
+		};
+
+		window.__FNS__.unshiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.unshiftArray($c1)});
+
+		window.__FNS__.shiftArray = (counterValues)=>()=>{
+			const newCounterValues = [...counterValues()];
+			newCounterValues.shift();
+			counterValues(newCounterValues);
+		};
+
+		window.__FNS__.shiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.shiftArray($c1)});
+
+		window.__FNS__.push100Array = (counterValues)=>()=>{
+			console.log('pushing 100');
+			const newCounterValues = [...counterValues()];
+			for (let i = 0; i < 100; i++) {
+				newCounterValues.push(rand());
+			}
+
+			counterValues(newCounterValues);
+		};
+
+		window.__FNS__.push100ArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.push100Array($c1)});
+
+		window.__FNS__.pop100Array = (counterValues)=>()=>{
+			console.log('popping 100');
+
+			const newCounterValues = [...counterValues()];
+			for (let i = 0; i < 100; i++) {
+				newCounterValues.pop();
+			}
+
+			counterValues(newCounterValues);
+		};
+
+		window.__FNS__.pop100ArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.pop100Array($c1)});
+
+		// this is a function that creates all attributes for the 0th child
+		// i.e. .map(()=><list-item><div/><button/></list-item>) -- <div/> is the 0th, <button/> is the 1th
+		window.__FNS__.__counterValues__map__el0_el1_attrs= (decrIndex, counterValues, index) => () => ({
+			onClick: ()=>decrIndex(index()),
+		});
+
+		window.__FNS__.__counterValues__map__el2_el0_attrs= (decrIndex, counterValues, index) => () => ({
+			onClick: ()=>decrIndex(index()),
+		});
+
+		window.__FNS__.__getValueFromIndex = (signal, index)=>()=>signal()[index()];
+	</script>
+	<let-signal name="counterValues" initial-value="[-4,1,6]"></let-signal>
+	<div id="for-each-example">
+		<span>For-each example:</span>
+		<div style="display: flex; flex-direction: row; gap: 30px;">
+			<div id="for-each-example-buttons" style="display: flex; flex-direction: column;">
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"pushArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Push random </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"popArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Pop </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"unshiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Unshift random </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"shiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Shift </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"push100ArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Push 100 </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"pop100ArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Pop 100 </button>
+				</signal-attrs>
+			</div>
+			<for-each
+				values='{"__type":"$$SIGNAL","id":"counterValues"}'
+			>
+				<template><!-- This template node exists to create more list items as the array expands. -->
+					<list-item>
+						<template>
+							<div style="display: block;">
+								<span>Index:
+									<signal-text
+										set-immediate="true"
+										value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'
+									>
+									</signal-text>
+								</span>
+								<signal-attrs
+									set-immediate="true"
+									value='{
+										"__type": "$$FUNCTION",
+										"module": "__counterValues__map__el0_el1_attrs",
+										"closure": [
+											{
+												"__type": "$$FUNCTION",
+												"module": "decrIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"}
+												]
+											},
+											{
+												"__type": "$$FUNCTION",
+												"module": "__getValueFromIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"},
+													{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+												]
+											},
+											{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+										]
+									}'
+								>
+									<button>-</button>
+								</signal-attrs>
+								<signal-text
+									set-immediate="true"
+									value='{
+										"__type": "$$FUNCTION",
+										"module": "__getValueFromIndex",
+										"closure": [
+											{"__type":"$$SIGNAL","id":"counterValues"},
+											{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+										]
+									}'
+								>
+								</signal-text>
+								<signal-attrs
+									set-immediate="true"
+									value='{
+										"__type": "$$FUNCTION",
+										"module": "__counterValues__map__el2_el0_attrs",
+										"closure": [
+											{
+												"__type": "$$FUNCTION",
+												"module": "incrIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"}
+												]
+											},
+											{
+												"__type": "$$FUNCTION",
+												"module": "__getValueFromIndex",
+												"closure": [
+													{"__type":"$$SIGNAL","id":"counterValues"},
+													{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+												]
+											},
+											{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+										]
+									}'
+								>
+									<button>+</button>
+								</signal-attrs>
+							</div>
+						</template>
+					</list-item>
+				</template>
+				<list-item initial-index="0">
+					<template>
+						<div style="display: block;">
+							<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
+							<signal-attrs
+								value='{
+									"__type": "$$FUNCTION",
+									"module": "__counterValues__map__el0_el1_attrs",
+									"closure": [
+										{
+											"__type": "$$FUNCTION",
+											"module": "decrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type": "$$FUNCTION",
+											"module": "__getValueFromIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"},
+												{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+											]
+										},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'
+							>
+								<button>-</button>
+							</signal-attrs>
+							<signal-text value='{
+								"__type": "$$FUNCTION",
+								"module": "__getValueFromIndex",
+								"closure": [
+									{"__type":"$$SIGNAL","id":"counterValues"},
+									{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+								]
+							}'>
+							-4
+							</signal-text>
+							<signal-attrs
+								value='{
+									"__type": "$$FUNCTION",
+									"module": "__counterValues__map__el2_el0_attrs",
+									"closure": [
+										{
+											"__type": "$$FUNCTION",
+											"module": "incrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type": "$$FUNCTION",
+											"module": "__getValueFromIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"},
+												{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+											]
+										},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'
+							>
+								<button>+</button>
+							</signal-attrs>
+						</div>
+					</template>
+				</list-item>
+				<list-item initial-index="1">
+					<template>
+						<div style="display: block;">
+							<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
+							<signal-attrs
+								value='{
+									"__type": "$$FUNCTION",
+									"module": "__counterValues__map__el0_el1_attrs",
+									"closure": [
+										{
+											"__type": "$$FUNCTION",
+											"module": "decrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type": "$$FUNCTION",
+											"module": "__getValueFromIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"},
+												{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+											]
+										},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'
+							>
+								<button>-</button>
+							</signal-attrs>
+							<signal-text value='{
+								"__type": "$$FUNCTION",
+								"module": "__getValueFromIndex",
+								"closure": [
+									{"__type":"$$SIGNAL","id":"counterValues"},
+									{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+								]
+							}'>
+							-4
+							</signal-text>
+							<signal-attrs
+								value='{
+									"__type": "$$FUNCTION",
+									"module": "__counterValues__map__el2_el0_attrs",
+									"closure": [
+										{
+											"__type": "$$FUNCTION",
+											"module": "incrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type": "$$FUNCTION",
+											"module": "__getValueFromIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"},
+												{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+											]
+										},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'
+							>
+								<button>+</button>
+							</signal-attrs>
+						</div>
+					</template>
+				</list-item>
+				<list-item initial-index="2">
+					<template>
+						<div style="display: block;">
+							<span>Index: <signal-text value='{"__type":"$$CONTEXT","selector":"list-item","key":"index"}'></signal-text></span>
+							<signal-attrs
+								value='{
+									"__type": "$$FUNCTION",
+									"module": "__counterValues__map__el0_el1_attrs",
+									"closure": [
+										{
+											"__type": "$$FUNCTION",
+											"module": "decrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type": "$$FUNCTION",
+											"module": "__getValueFromIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"},
+												{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+											]
+										},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'
+							>
+								<button>-</button>
+							</signal-attrs>
+							<signal-text value='{
+								"__type": "$$FUNCTION",
+								"module": "__getValueFromIndex",
+								"closure": [
+									{"__type":"$$SIGNAL","id":"counterValues"},
+									{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+								]
+							}'>
+							-4
+							</signal-text>
+							<signal-attrs
+								value='{
+									"__type": "$$FUNCTION",
+									"module": "__counterValues__map__el2_el0_attrs",
+									"closure": [
+										{
+											"__type": "$$FUNCTION",
+											"module": "incrIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"}
+											]
+										},
+										{
+											"__type": "$$FUNCTION",
+											"module": "__getValueFromIndex",
+											"closure": [
+												{"__type":"$$SIGNAL","id":"counterValues"},
+												{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+											]
+										},
+										{"__type":"$$CONTEXT","selector":"list-item","key":"index"}
+									]
+								}'
+							>
+								<button>+</button>
+							</signal-attrs>
+						</div>
+					</template>
+				</list-item>
+			</for-each>
+		</div>
+	</div>
 </html>
