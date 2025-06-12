@@ -1,4 +1,3 @@
-/** @jsx createElement */
 import { createElement, createSignal } from "@solenoid/server-runtime";
 
 export function Counter() {

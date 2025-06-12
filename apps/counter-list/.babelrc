@@ -1,7 +1,11 @@
 {
-  "plugins": [
-    ["@babel/plugin-syntax-typescript", { "isTSX": true }],
-    "@solenoid/babel-plugin",
-    ["@babel/plugin-transform-typescript", { "isTSX": true }]
-  ]
+	"plugins": [
+		["@babel/plugin-syntax-typescript", { "isTSX": true }],
+		"@solenoid/babel-plugin",
+		["@babel/plugin-transform-typescript", { "isTSX": true }],
+		[
+			"@babel/plugin-transform-react-jsx",
+			{ "runtime": "automatic", "importSource": "@solenoid/server-runtime" }
+		]
+	]
 }

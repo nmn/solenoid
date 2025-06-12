@@ -2,13 +2,27 @@
 	"name": "@solenoid/server-runtime",
 	"version": "0.0.0",
 	"description": "Runtime for rendering on the server. TBD",
-	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./lib/index.js",
+			"types": "./src/index.ts"
+		},
+		"./jsx-runtime": {
+			"import": "./lib/jsx-runtime/index.js",
+			"types": "./src/jsx-runtime/index.ts"
+		}
+	},
 	"repository": "https://github.com/nmn/solenoid",
 	"license": "MIT",
 	"scripts": {
-		"build": "bunx concurrently \"bun run build-types\" \"bun run build-code\"",
-		"build-code": "find ./src -name '*.ts' -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build": "concurrently \"bun run build-types\" \"bun run build-code-base\" \"bun run build-code-components\" \"bun run build-code-hooks\" \"bun run build-code-jsx-runtime\" \"bun run build-code-renderer\" \"bun run build-code-types\" \"bun run build-code-utils\"",
+		"build-code-base": "find ./src/*.ts -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-code-components": "find ./src/components/*.ts -exec sh -c 'bun build {} --outfile ./lib/components/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-code-hooks": "find ./src/hooks/*.ts -exec sh -c 'bun build {} --outfile ./lib/hooks/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-code-jsx-runtime": "find ./src/jsx-runtime/*.ts -exec sh -c 'bun build {} --outfile ./lib/jsx-runtime/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-code-renderer": "find ./src/renderer/*.ts -exec sh -c 'bun build {} --outfile ./lib/renderer/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-code-types": "find ./src/types/*.ts -exec sh -c 'bun build {} --outfile ./lib/types/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build-code-utils": "find ./src/utils/*.ts -exec sh -c 'bun build {} --outfile ./lib/utils/$(basename {} .ts).js --target node --no-bundle' \\;",
 		"build-types": "bun run ./build-types.ts",
 		"test": "vitest"
 	},
@@ -17,6 +31,7 @@
 		"@solenoid/custom-elements": "^0.0.0"
 	},
 	"devDependencies": {
-		"@solenoid/custom-elements": "^0.0.0"
+		"@solenoid/custom-elements": "^0.0.0",
+		"concurrently": "^9.1.2"
 	}
 }

@@ -6,7 +6,8 @@
 		"jsxFactory": "createElement",
 		"jsxFragmentFactory": "Fragment",
 		"paths": {
-			"@solenoid/custom-elements/lib/*": ["./packages/custom-elements/src/*"]
+			"@solenoid/custom-elements/lib/*": ["./packages/custom-elements/src/*"],
+			"@solenoid/server-runtime/*": ["./packages/server-runtime/src/*"]
 		}
 	}
 }

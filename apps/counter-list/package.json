@@ -16,6 +16,7 @@
 		"@solenoid/server-runtime": "*"
 	},
 	"devDependencies": {
+		"@babel/plugin-transform-react-jsx": "^7.27.1",
 		"@solenoid/babel-plugin": "*"
 	}
 }

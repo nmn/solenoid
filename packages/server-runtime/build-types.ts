@@ -6,14 +6,14 @@ import {
 	createCompilerHost,
 	createProgram,
 } from "typescript";
-import { resolve, dirname, relative, basename, isAbsolute } from "path";
+import { resolve, dirname, relative, basename, isAbsolute } from "node:path";
 const projectDir = resolve(import.meta.dir);
 const srcDir = resolve(projectDir, "src");
 const outDir = resolve(projectDir, "lib");
 const tsconfigPath = findConfigFile(projectDir, tsSys.fileExists);
 
 let rootDir = projectDir;
-let resolvedConfig;
+let resolvedConfig: any;
 if (tsconfigPath) {
 	rootDir = dirname(tsconfigPath);
 	resolvedConfig = readConfigFile(tsconfigPath, tsSys.readFile)?.config;
@@ -50,22 +50,23 @@ const rootFiles = finalParsed.fileNames.filter((file) => {
 });
 
 const host = createCompilerHost(finalParsed.options);
-const originalWriteFile = host.writeFile;
 
-host.writeFile = (fileName, data, writeBOM, onError, sourceFiles) => {
-	if (
-		!fileName.endsWith(".d.ts") ||
-		!sourceFiles?.some((source) => {
-			const rel = relative(srcDir, source.fileName);
-			return !isAbsolute(rel) && !rel.startsWith("..");
-		})
-	) {
-		return;
-	}
+// const originalWriteFile = host.writeFile;
 
-	const flatPath = resolve(outDir, basename(fileName));
-	originalWriteFile(flatPath, data, writeBOM, onError, sourceFiles);
-};
+// host.writeFile = (fileName, data, writeBOM, onError, sourceFiles) => {
+// 	if (
+// 		!fileName.endsWith(".d.ts") ||
+// 		!sourceFiles?.some((source) => {
+// 			const rel = relative(srcDir, source.fileName);
+// 			return !isAbsolute(rel) && !rel.startsWith("..");
+// 		})
+// 	) {
+// 		return;
+// 	}
+
+// 	const flatPath = resolve(outDir, basename(fileName));
+// 	originalWriteFile(flatPath, data, writeBOM, onError, sourceFiles);
+// };
 
 const program = createProgram(rootFiles, finalParsed.options, host);
 const result = program.emit();

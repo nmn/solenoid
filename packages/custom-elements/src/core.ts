@@ -69,7 +69,7 @@ class SignalStore {
 			this.resolvers.set(id, []);
 		}
 
-		this.resolvers.get(id)!.push(value);
+		this.resolvers.get(id)?.push(value);
 	}
 
 	private async resolveAllFor(id: string, signal: Signal<any>): Promise<void> {

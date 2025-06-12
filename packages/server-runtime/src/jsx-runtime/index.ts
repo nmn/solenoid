@@ -7,3 +7,7 @@ export function createElement(
 ) {
 	return new Element(type, props, children.length > 1 ? children : children[0]);
 }
+
+export const jsx = createElement;
+export const jsxs = createElement;
+export const jsxDEV = createElement;
