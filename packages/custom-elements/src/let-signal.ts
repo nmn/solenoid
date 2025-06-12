@@ -51,7 +51,9 @@ export class LetSignal<T> extends HTMLElement {
 	}
 
 	disconnectedCallback() {
-		signalStore.delete(this.name!);
+		if (this.name != null) {
+			signalStore.delete(this.name);
+		}
 	}
 }
 
