@@ -99,6 +99,8 @@
 	<!--
 		const counterValues = createSignal([-4,1,6]); // Render 3 counters next to each other, each with a different initial value & state
 		
+		const rand = ()=>Math.floor(Math.random() * (100 - 1 + 1) + 1);
+
 		const decrIndex = (index)=>{
 			const nextCounterValues = [...counterValues()];
 			nextCounterValues[index]--;
@@ -112,7 +114,9 @@
 		};
 
 		const pushArray = ()=>{
-			counterValues([...counterValues(), Math.floor(Math.random() * (100 - 1 + 1) + 1)])
+			const newVal = rand();
+			console.log('pushing');
+			counterValues([...counterValues(), newVal])
 		};
 
 		const popArray = ()=>{
@@ -122,7 +126,7 @@
 		};
 
 		const unshiftArray = ()=>{
-			counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
+			counterValues([rand(), ...counterValues()])
 		};
 
 		const shiftArray = ()=>{
@@ -130,6 +134,13 @@
 			newCounterValues.shift();
 			counterValues(newCounterValues);
 		};
+
+		const push2Array = ()=>{
+			console.log('pushing 2');
+			const newVal1 = rand();
+			const newVal2 = rand();
+			counterValues([...counterValues(), newVal1, newVal2]);
+		}
 
 		return (
 			<div id="for-each-example">
@@ -140,6 +151,7 @@
 						<button onClick={popArray}> Pop </button>
 						<button onClick={unshiftArray}> Unshift random </button>
 						<button onClick={shiftArray}> Shift </button>
+						<button onClick={push2Array}> Push 2 </button>
 					</div>
 					<for-each
 						values={counterValues}
@@ -157,6 +169,8 @@
 		);
 	-->
 	<script id="for-each-example-js">
+		const rand = ()=>Math.floor(Math.random() * (100 - 1 + 1) + 1);
+
 		window.__FNS__.decrIndex = ($c1)=>($p1)=>{
 			const nextCounterValues = [...$c1()];
 			nextCounterValues[$p1]--;
@@ -170,7 +184,7 @@
 		}
 
 		window.__FNS__.pushArray = (counterValues)=>()=>{
-			const newVal = Math.floor(Math.random() * (100 - 1 + 1) + 1);
+			const newVal = rand();
 			console.log('pushing', newVal);
 			counterValues([...counterValues(), newVal])
 		};
@@ -186,7 +200,7 @@
 		window.__FNS__.popArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.popArray($c1)});
 
 		window.__FNS__.unshiftArray = (counterValues)=>()=>{
-			counterValues([Math.floor(Math.random() * (100 - 1 + 1) + 1), ...counterValues()])
+			counterValues([rand(), ...counterValues()])
 		};
 
 		window.__FNS__.unshiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.unshiftArray($c1)});
@@ -198,6 +212,16 @@
 		};
 
 		window.__FNS__.shiftArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.shiftArray($c1)});
+
+		window.__FNS__.push2Array = (counterValues)=>()=>{
+			console.log('pushing 2');
+			const newVal1 = rand();
+			const newVal2 = rand();
+
+			counterValues([...counterValues(), newVal1, newVal2]);
+		};
+
+		window.__FNS__.push2ArrayAttrs = ($c1)=>()=>({onClick: window.__FNS__.push2Array($c1)});
 
 		// this is a function that creates all attributes for the 0th child
 		// i.e. .map(()=><list-item><div/><button/></list-item>) -- <div/> is the 0th, <button/> is the 1th
@@ -235,6 +259,11 @@
 					value='{"__type":"$$FUNCTION","module":"shiftArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
 				>
 					<button> Shift </button>
+				</signal-attrs>
+				<signal-attrs
+					value='{"__type":"$$FUNCTION","module":"push2ArrayAttrs","closure":[{"__type":"$$SIGNAL","id":"counterValues"}]}'
+				>
+					<button> Push 2 </button>
 				</signal-attrs>
 			</div>
 			<for-each
