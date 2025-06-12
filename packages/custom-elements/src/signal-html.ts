@@ -38,7 +38,7 @@ export class SignalText extends HTMLElement {
 
 	private cleanUp: null | (() => void) = null;
 	private value?: () => unknown;
-	isConnected = true;
+	_isConnected = false;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -46,9 +46,9 @@ export class SignalText extends HTMLElement {
 		if (!value) {
 			throw new Error("signal-text must have a value attribute");
 		}
-		this.isConnected = true;
+		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(value);
-		if (!this.isConnected) {
+		if (!this._isConnected) {
 			return;
 		}
 
@@ -57,15 +57,19 @@ export class SignalText extends HTMLElement {
 
 			requestAnimationFrame(() => this.render());
 		} else {
-			this.isConnected = false;
+			this._isConnected = false;
 		}
 	}
 
 	render() {
 		this.cleanUp?.();
+		const value = this.value;
+		if (!value) {
+			return;
+		}
 		const stopScope = effectScope(() => {
 			effect(() => {
-				const latestText = this.value!();
+				const latestText = value();
 				this.innerText = String(latestText);
 			});
 		});
@@ -74,7 +78,7 @@ export class SignalText extends HTMLElement {
 
 	disconnectedCallback() {
 		this.cleanUp && this.cleanUp();
-		this.isConnected = false;
+		this._isConnected = false;
 	}
 }
 customElements.define("signal-text", SignalText);
@@ -98,15 +102,15 @@ export class SignalAttrs extends HTMLElement {
 	private abortController: AbortController = new AbortController();
 	private cleanUp: null | (() => void) = null;
 	private value?: () => { [key: string]: unknown };
-	isConnected = true;
+	_isConnected = false;
 
 	async connectedCallback() {
-		if (!this.isConnected) return;
+		if (!this._isConnected) return;
 		const value = this.getAttribute("value");
 		if (!value) {
 			throw new Error("signal-text must have a value attribute");
 		}
-		this.isConnected = true;
+		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(value);
 
 		if (parsedValue && typeof parsedValue === "function") {
@@ -114,16 +118,20 @@ export class SignalAttrs extends HTMLElement {
 
 			requestAnimationFrame(() => this.render());
 		} else {
-			this.isConnected = false;
+			this._isConnected = false;
 		}
 	}
 
 	render() {
 		// There should only ever be a single child element
 		const childElement = this.children[0] as HTMLElement;
+		const value = this.value;
+		if (!value) {
+			return;
+		}
 		const stopScope = effectScope(() => {
 			effect(() => {
-				const latestAttrs = this.value!();
+				const latestAttrs = value();
 				// unbind previous event listeners and re-attach them
 				this.abortController.abort();
 				this.abortController = new AbortController();
@@ -152,7 +160,7 @@ export class SignalAttrs extends HTMLElement {
 	disconnectedCallback() {
 		this.cleanUp && this.cleanUp();
 		this.abortController.abort();
-		this.isConnected = false;
+		this._isConnected = false;
 	}
 }
 
@@ -163,8 +171,8 @@ export class ShowWhen extends HTMLElement {
 
 	private condition?: () => unknown;
 	private cleanUp: null | (() => void) = null;
-	private templateHTML: string | null = null;
-	isConnected = true;
+	private templateHTML = "";
+	_isConnected = false;
 
 	async connectedCallback() {
 		if (!this.isConnected) return;
@@ -172,9 +180,9 @@ export class ShowWhen extends HTMLElement {
 		if (!condition) {
 			throw new Error("signal-text must have a condition attribute");
 		}
-		this.isConnected = true;
+		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(condition);
-		if (!this.isConnected) {
+		if (!this._isConnected) {
 			return;
 		}
 
@@ -183,19 +191,23 @@ export class ShowWhen extends HTMLElement {
 
 			requestAnimationFrame(() => this.render());
 		} else {
-			this.isConnected = false;
+			this._isConnected = false;
 		}
 	}
 
 	render() {
 		this.cleanUp && this.cleanUp();
-		this.templateHTML ??= this.innerHTML;
+		this.templateHTML ||= this.innerHTML;
+		const condition = this.condition;
+		if (!condition) {
+			return;
+		}
 		const stopScope = effectScope(() => {
 			effect(() => {
-				if (this.condition!()) {
-					this.innerHTML = this.templateHTML!;
+				if (condition()) {
+					this.innerHTML = this.templateHTML;
 				} else {
-					this.templateHTML = this.innerHTML.trim() ?? this.templateHTML;
+					this.templateHTML = this.innerHTML.trim() || this.templateHTML;
 					this.innerHTML = "";
 				}
 			});
@@ -205,7 +217,7 @@ export class ShowWhen extends HTMLElement {
 
 	disconnectedCallback() {
 		this.cleanUp && this.cleanUp();
-		this.isConnected = false;
+		this._isConnected = false;
 	}
 }
 customElements.define("show-when", ShowWhen);
