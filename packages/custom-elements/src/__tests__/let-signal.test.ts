@@ -1,10 +1,6 @@
 // Instantiate custom elements
 import "..";
-import {
-	randomString,
-	waitForElement,
-	waitForElementToBeRemoved,
-} from "./helpers";
+import { randomString } from "./helpers";
 import { LetSignal } from "../let-signal";
 import { describe, expect, test, beforeEach } from "vitest";
 import { signalStore } from "../core";
@@ -25,16 +21,13 @@ describe("let-signal", () => {
 		// initialization
 		const name = randomString();
 		const initialValue = 0;
-		const element = document.createElement("let-signal") as LetSignal<
-			typeof initialValue
-		>;
+		const element = new LetSignal<typeof initialValue>();
 
 		element.setAttribute("name", name);
 		element.setAttribute("initial-value", JSON.stringify(initialValue));
 
 		// placement
-		document.body.append(element);
-		await waitForElement(element);
+		element.connectedCallback();
 
 		const signal = signalStore.get(name);
 		expect(signal).not.toBeNull();
@@ -42,19 +35,17 @@ describe("let-signal", () => {
 		expect(element.getSignal()).toBe(signal);
 
 		// removal
-		document.body.removeChild(element);
-		await waitForElementToBeRemoved(element);
+		element.disconnectedCallback();
 		expect(signalStore.get(name)).toBe(undefined);
 	});
 
 	test("falls back to `null` if the initial value is not set", async () => {
 		const name = randomString();
-		const element = document.createElement("let-signal") as LetSignal<null>;
+		const element = new LetSignal<null>();
 
 		element.setAttribute("name", name);
 
-		document.body.append(element);
-		await waitForElement(element);
+		element.connectedCallback();
 
 		const signal = signalStore.get(name);
 		expect(signal).not.toBeNull();

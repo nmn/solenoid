@@ -35,6 +35,7 @@ describe("signal-attrs", () => {
 		});
 		element.setAttribute("value", signalJSON);
 
+		element._isConnected = true;
 		await element.connectedCallback();
 		await awaitRepaint();
 
@@ -63,6 +64,7 @@ describe("signal-attrs", () => {
 		}));
 		element.setAttribute("value", fnJson);
 
+		element._isConnected = true;
 		await element.connectedCallback();
 		await awaitRepaint();
 		expect(fn).toHaveBeenCalledTimes(1);
@@ -89,6 +91,7 @@ describe("signal-attrs", () => {
 		});
 		element.setAttribute("value", signalJSON);
 
+		element._isConnected = true;
 		await element.connectedCallback();
 		await awaitRepaint();
 
@@ -130,6 +133,7 @@ describe("signal-attrs", () => {
 		const ptr = Symbol("ptr");
 		(div as any).__ptr = ptr;
 
+		element._isConnected = true;
 		await element.connectedCallback();
 		await awaitRepaint();
 
