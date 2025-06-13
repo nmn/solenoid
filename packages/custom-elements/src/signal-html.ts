@@ -101,11 +101,11 @@ export class SignalAttrs extends HTMLElement {
 
 	private abortController: AbortController = new AbortController();
 	private cleanUp: null | (() => void) = null;
-	private value?: () => { [key: string]: unknown };
+	value?: () => { [key: string]: unknown };
 	_isConnected = false;
 
 	async connectedCallback() {
-		if (!this._isConnected) return;
+		if (this._isConnected) return;
 		const value = this.getAttribute("value");
 		if (!value) {
 			throw new Error("signal-text must have a value attribute");
@@ -175,7 +175,7 @@ export class ShowWhen extends HTMLElement {
 	_isConnected = false;
 
 	async connectedCallback() {
-		if (!this.isConnected) return;
+		if (this._isConnected) return;
 		const condition = this.getAttribute("condition");
 		if (!condition) {
 			throw new Error("signal-text must have a condition attribute");
