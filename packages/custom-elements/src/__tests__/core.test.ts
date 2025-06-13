@@ -66,8 +66,8 @@ describe("core", () => {
 					(...args2: string[]) => [...args, ...args2],
 			);
 			// Needs an update to core.ts to use .default to work
-			// vi.doMock(moduleName, ()=>makeESM(fakeModuleWithClosure));
-			window.__FNS__[moduleName] = fakeModuleWithClosure;
+			vi.doMock(moduleName, () => makeESM(fakeModuleWithClosure));
+			// window.__FNS__[moduleName] = fakeModuleWithClosure;
 
 			const closure = ["a", "b", "c"];
 
@@ -134,9 +134,9 @@ describe("core", () => {
 	});
 });
 
-// function makeESM<T>(obj: T): {default: T} {
-//   return {
-//     __esModule: true,
-//     default: obj,
-//   } as {default: T};
-// }
+function makeESM<T>(obj: T): { default: T } {
+	return {
+		__esModule: true,
+		default: obj,
+	} as { default: T };
+}

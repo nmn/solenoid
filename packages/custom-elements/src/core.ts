@@ -18,7 +18,9 @@ const hydrateJSON = async (value: unknown): Promise<unknown> => {
 	if (typeof value === "object" && value !== null) {
 		if (isSolenoidFunction(value)) {
 			const fnObj = value;
-			const fnPromise = window.__FNS__[fnObj.module] ?? import(fnObj.module);
+			const fnPromise =
+				window.__FNS__[fnObj.module] ??
+				import(fnObj.module).then(({ default: v }) => v);
 			const closurePromises = Promise.all(fnObj.closure.map(hydrateJSON));
 
 			const [fn, closure] = await Promise.all([fnPromise, closurePromises]);
