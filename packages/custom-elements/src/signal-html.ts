@@ -100,7 +100,7 @@ export class SignalAttrs extends HTMLElement {
 
 	private abortController: AbortController = new AbortController();
 	private cleanUp: null | (() => void) = null;
-	value?: () => { [key: string]: unknown };
+	value?: { [key: string]: () => unknown };
 	_isConnected = false;
 
 	async connectedCallback() {
@@ -111,7 +111,7 @@ export class SignalAttrs extends HTMLElement {
 		}
 		const parsedValue = await JSON_PARSE(value);
 
-		if (parsedValue && typeof parsedValue === "function") {
+		if (parsedValue && typeof parsedValue === "object") {
 			this.value = parsedValue;
 			await AfterAddObserver.register(this);
 			this._isConnected = true;
@@ -130,25 +130,29 @@ export class SignalAttrs extends HTMLElement {
 		}
 		const stopScope = effectScope(() => {
 			effect(() => {
-				const latestAttrs = value();
+				const latestAttrs = value;
 				// unbind previous event listeners and re-attach them
 				this.abortController.abort();
 				this.abortController = new AbortController();
 				for (const key of Object.keys(latestAttrs)) {
+					const value = latestAttrs[key];
+					if (value == null) {
+						continue;
+					}
 					if (key.match(/^on[A-Z]/)) {
 						// Wasteful right now, but ok
 						// Event listener exists, add it
 						childElement.addEventListener(
 							key.slice(2).toLowerCase(),
-							latestAttrs[key] as EventListener,
+							value as EventListener,
 							{ signal: this.abortController.signal },
 						);
 					} else if (key in childElement) {
 						// Property exists, set it directly
-						(childElement as any)[key] = latestAttrs[key];
+						(childElement as any)[key] = value();
 					} else {
 						// Property doesn't exist, fall back to setAttribute
-						childElement.setAttribute(key, String(latestAttrs[key]));
+						childElement.setAttribute(key, String(value()));
 					}
 				}
 			});
