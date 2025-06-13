@@ -1,3 +1,4 @@
+import { SolenoidExclusiveHtmlTags } from "./html-tags";
 import { createSignal, signalStore } from "./core";
 import type { Signal } from "./utils/types";
 
@@ -11,7 +12,7 @@ export class LetSignal<T> extends HTMLElement {
 	connectedCallback() {
 		const name = this.getAttribute("name");
 		if (!name) {
-			throw new Error("let-signal must have a name attribute");
+			throw new Error(`${this.localName} must have a name attribute`);
 		}
 
 		this.name = name;
@@ -57,4 +58,4 @@ export class LetSignal<T> extends HTMLElement {
 	}
 }
 
-customElements.define("let-signal", LetSignal);
+customElements.define(SolenoidExclusiveHtmlTags.letSignal, LetSignal);

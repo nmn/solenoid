@@ -1,5 +1,6 @@
 import { effect, effectScope } from "alien-signals";
 import { JSON_PARSE } from "./core";
+import { SolenoidExclusiveHtmlTags } from "./html-tags";
 
 export class SignalText extends HTMLElement {
 	/*
@@ -44,7 +45,7 @@ export class SignalText extends HTMLElement {
 		if (!this.isConnected) return;
 		const value = this.getAttribute("value");
 		if (!value) {
-			throw new Error("signal-text must have a value attribute");
+			throw new Error(`${this.localName} must have a value attribute`);
 		}
 		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(value);
@@ -81,7 +82,7 @@ export class SignalText extends HTMLElement {
 		this._isConnected = false;
 	}
 }
-customElements.define("signal-text", SignalText);
+customElements.define(SolenoidExclusiveHtmlTags.signalText, SignalText);
 
 export class SignalAttrs extends HTMLElement {
 	/*
@@ -108,7 +109,7 @@ export class SignalAttrs extends HTMLElement {
 		if (!this._isConnected) return;
 		const value = this.getAttribute("value");
 		if (!value) {
-			throw new Error("signal-text must have a value attribute");
+			throw new Error(`${this.localName} must have a value attribute`);
 		}
 		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(value);
@@ -164,7 +165,7 @@ export class SignalAttrs extends HTMLElement {
 	}
 }
 
-customElements.define("signal-attrs", SignalAttrs);
+customElements.define(SolenoidExclusiveHtmlTags.signalAttrs, SignalAttrs);
 
 export class ShowWhen extends HTMLElement {
 	static observedAttributes = ["condition"];
@@ -178,7 +179,7 @@ export class ShowWhen extends HTMLElement {
 		if (!this.isConnected) return;
 		const condition = this.getAttribute("condition");
 		if (!condition) {
-			throw new Error("signal-text must have a condition attribute");
+			throw new Error(`${this.localName} must have a condition attribute`);
 		}
 		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(condition);
@@ -220,4 +221,4 @@ export class ShowWhen extends HTMLElement {
 		this._isConnected = false;
 	}
 }
-customElements.define("show-when", ShowWhen);
+customElements.define(SolenoidExclusiveHtmlTags.showWhen, ShowWhen);

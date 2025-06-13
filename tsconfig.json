@@ -1,12 +1,16 @@
 {
-	"extends": "@tsconfig/bun/tsconfig.json",
+	"extends": [
+		"@tsconfig/bun/tsconfig.json",
+		"@solenoid/server-runtime/tsconfig/recommended.json"
+	],
 	"compilerOptions": {
 		"noEmit": true,
 		"jsx": "react",
 		"jsxFactory": "createElement",
 		"jsxFragmentFactory": "Fragment",
 		"paths": {
-			"@solenoid/custom-elements/lib/*": ["./packages/custom-elements/src/*"]
+			"@solenoid/custom-elements/lib/*": ["./packages/custom-elements/src/*"],
+			"@solenoid/server-runtime/lib/*": ["./packages/server-runtime/src/*"]
 		}
 	}
 }

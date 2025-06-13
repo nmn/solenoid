@@ -12,7 +12,9 @@
 		"build-types": "bun run ./build-types.ts",
 		"test": "vitest"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"html-tags": "^5.0.0"
+	},
 	"peerDependencies": {
 		"@solenoid/custom-elements": "^0.0.0"
 	},
