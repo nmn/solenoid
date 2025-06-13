@@ -3,7 +3,11 @@ import { ForEach } from "../components/ForEach";
 import { Suspense } from "../components/Suspense";
 import { When } from "../components/When";
 
-export let currentID = "0";
+export let currentID = "_0";
+let signalIndex = 0;
+export function useSignalIndex() {
+	return signalIndex++;
+}
 
 const selfClosingTags = [
 	"img",
@@ -32,15 +36,27 @@ export async function* renderToStream(
 	id = "0",
 	queue: Promise<string>[] = [],
 	inSuspense = false,
-) {
+	fnsSoFar: string[] = [],
+): AsyncGenerator<string, string | undefined, unknown> {
 	currentID = id;
+	signalIndex = 0;
+
+	if (typeof el.type === "function") {
+		let result = el.type({ ...el.props, children: el.children });
+		if (result != null && typeof result === "object" && "then" in result) {
+			result = await result;
+		}
+		yield* renderToStream(result, `${id}_${0}`, queue, inSuspense, fnsSoFar);
+		return;
+	}
+
 	if (typeof el.type === "string") {
-		const children = el.props.children;
+		const children = el.children;
 		const fnProps = Object.entries(el.props).filter(
-			([key, prop]) => typeof prop === "function" && key !== "children",
+			([key, prop]) => typeof prop === "function",
 		);
 		const basicProps = Object.entries(el.props)
-			.filter(([key, prop]) => typeof prop !== "function" && key !== "children")
+			.filter(([key, prop]) => typeof prop !== "function")
 			.map(([key, val]) => ` ${key}="${String(val)}"`)
 			.join("");
 
@@ -56,7 +72,22 @@ export async function* renderToStream(
 		}
 
 		if (fnProps.length === 0) {
-			return openingTag + closingTag;
+			if (children == null || children.length === 0) {
+				yield openingTag + closingTag;
+				return;
+			}
+			yield openingTag;
+			for (let i = 0; i < children.length; i++) {
+				const child = children[i];
+				yield* renderToStream(
+					child as any,
+					`${id}_${i}`,
+					queue,
+					inSuspense,
+					fnsSoFar,
+				);
+			}
+			yield closingTag;
 		}
 	}
 }

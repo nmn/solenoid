@@ -8,7 +8,7 @@
 	"repository": "https://github.com/nmn/solenoid",
 	"license": "MIT",
 	"scripts": {
-		"build": "babel src/*.tsx --out-dir lib/ --extensions '.js,.jsx,.ts,.tsx'",
+		"build": "babel src/ --out-dir lib/ --extensions '.js,.jsx,.ts,.tsx'",
 		"test": "vitest"
 	},
 	"dependencies": {
