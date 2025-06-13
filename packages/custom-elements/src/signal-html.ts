@@ -197,7 +197,11 @@ export class ShowWhen extends HTMLElement {
 
 	render() {
 		this.cleanUp && this.cleanUp();
-		this.templateHTML ||= this.innerHTML;
+		this.templateHTML ||=
+			this.children.length === 1 &&
+			this.children[0] instanceof HTMLTemplateElement
+				? this.children[0].innerHTML
+				: this.innerHTML;
 		const condition = this.condition;
 		if (!condition) {
 			return;
@@ -208,7 +212,7 @@ export class ShowWhen extends HTMLElement {
 					this.innerHTML = this.templateHTML;
 				} else {
 					this.templateHTML = this.innerHTML.trim() || this.templateHTML;
-					this.innerHTML = "";
+					this.innerHTML = `<template>${this.templateHTML}</template>`;
 				}
 			});
 		});
