@@ -1,5 +1,6 @@
 import { effect, effectScope } from "alien-signals";
 import { JSON_PARSE } from "./core";
+import { AfterAddObserver } from "./utils/await-end";
 
 export class SignalText extends HTMLElement {
 	/*
@@ -41,21 +42,19 @@ export class SignalText extends HTMLElement {
 	_isConnected = false;
 
 	async connectedCallback() {
-		if (!this.isConnected) return;
+		if (this._isConnected) return;
+
 		const value = this.getAttribute("value");
 		if (!value) {
 			throw new Error("signal-text must have a value attribute");
 		}
-		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(value);
-		if (!this._isConnected) {
-			return;
-		}
 
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
-
-			requestAnimationFrame(() => this.render());
+			await AfterAddObserver.register(this);
+			this._isConnected = true;
+			this.render();
 		} else {
 			this._isConnected = false;
 		}
@@ -110,13 +109,13 @@ export class SignalAttrs extends HTMLElement {
 		if (!value) {
 			throw new Error("signal-text must have a value attribute");
 		}
-		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(value);
 
 		if (parsedValue && typeof parsedValue === "function") {
 			this.value = parsedValue;
-
-			requestAnimationFrame(() => this.render());
+			await AfterAddObserver.register(this);
+			this._isConnected = true;
+			this.render();
 		} else {
 			this._isConnected = false;
 		}
@@ -180,16 +179,13 @@ export class ShowWhen extends HTMLElement {
 		if (!condition) {
 			throw new Error("signal-text must have a condition attribute");
 		}
-		this._isConnected = true;
 		const parsedValue = await JSON_PARSE(condition);
-		if (!this._isConnected) {
-			return;
-		}
 
 		if (parsedValue && typeof parsedValue === "function") {
 			this.condition = parsedValue;
-
-			requestAnimationFrame(() => this.render());
+			await AfterAddObserver.register(this);
+			this._isConnected = true;
+			this.render();
 		} else {
 			this._isConnected = false;
 		}
