@@ -23,7 +23,7 @@ export function serializableFn<T extends SerializableFn>({
 }: SerializableFnConf<T>): ReturnType<T> &
 	SolenoidFunctionConfig<Parameters<T>> {
 	const closureVars = closure();
-	const fnWithClosuresFilled = fn(...closureVars) as ReturnType<typeof fn>;
+	const fnWithClosuresFilled = fn(closure) as ReturnType<typeof fn>;
 
 	const config: SolenoidFunctionConfig<typeof closureVars> = {
 		[SOLENOID_CUSTOM_KEY]: SOLENOID_OBJECT_TYPES.Function,

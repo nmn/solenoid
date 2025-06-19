@@ -1,6 +1,6 @@
 import { createElement, createSignal } from "@solenoid/server-runtime";
 
-export function Counter() {
+export function Static() {
 	const count = createSignal(0);
 	return (
 		<div>

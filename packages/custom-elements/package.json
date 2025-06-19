@@ -15,5 +15,7 @@
 		"alien-signals": "^2.0.4",
 		"lodash.debounce": "^4.0.8"
 	},
-	"devDependencies": {}
+	"devDependencies": {
+		"express": "^5.1.0"
+	}
 }

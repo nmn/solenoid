@@ -1,0 +1,16 @@
+<html><head><title> Counter Test </title> <script src="/lib/index.js"></script></head>
+    <let-signal name="count" initial-value="0"></let-signal>
+    <script> window.__FNS__.decr = ($c1) => () => $c1($c1() - 1); </script>
+    <signal-text value='{"__type":"$$SIGNAL","id":"count"}'>0</signal-text>
+    <signal-attrs value='{"onClick":{"__type":"$$FUNCTION","module":"decr","closure":[{"__type":"$$SIGNAL","id":"count"}]}}'> <button>Decrement</button> </signal-attrs>
+    <script> window.__FNS__.incr = ($c1) => () => $c1($c1() + 1); </script>
+    <signal-attrs value='{"onClick":{"__type":"$$FUNCTION","module":"incr","closure":[{"__type":"$$SIGNAL","id":"count"}]}}'> <button>Increment</button> </signal-attrs>
+    <h1>Double Count:</h1>
+    <script> window.__FNS__.dcount = ($c1) => () => $c1() * 2; </script>
+    <signal-text value='{"__type":"$$FUNCTION","module":"dcount","closure":[{"__type":"$$SIGNAL","id":"count"}]}'>0</signal-text>
+    <h2>Another LINE BREAK</h2>
+    <script> window.__FNS__.whenEven = ($c1) => () => $c1() % 2 === 0; window.__FNS__.whenOdd = ($c1) => () => $c1() % 2 !== 0; </script>
+    <h1>Is Count Even or Odd?</h1>
+    <show-when condition='{"__type":"$$FUNCTION","module":"whenEven","closure":[{"__type":"$$SIGNAL","id":"count"}]}'> is Even! </show-when>
+    <show-when condition='{"__type":"$$FUNCTION","module":"whenOdd","closure":[{"__type":"$$SIGNAL","id":"count"}]}'> is Odd! </show-when>
+</html>

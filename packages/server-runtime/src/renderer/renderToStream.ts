@@ -9,6 +9,11 @@ export function useSignalIndex() {
 	return signalIndex++;
 }
 
+let currentSignalDefs: string[] = [];
+export function addSignalDef(def: string) {
+	currentSignalDefs.push(def);
+}
+
 const selfClosingTags = [
 	"img",
 	"br",
@@ -30,9 +35,8 @@ const selfClosingTags = [
 	"only",
 ];
 
-// biome-ignore lint/correctness/useYield: It'll be used eventually
 export async function* renderToStream(
-	el: Element,
+	el: Element | (() => unknown) | string,
 	id = "0",
 	queue: Promise<string>[] = [],
 	inSuspense = false,
@@ -41,8 +45,24 @@ export async function* renderToStream(
 	currentID = id;
 	signalIndex = 0;
 
+	if (typeof el === "string") {
+		yield el;
+		return;
+	}
+
+	if (typeof el === "function") {
+		const result = el();
+		const stringified = JSON.stringify(el);
+		yield `<signal-text value='${stringified}'>${result}</signal-text>`;
+		return;
+	}
+
 	if (typeof el.type === "function") {
 		let result = el.type({ ...el.props, children: el.children });
+		for (const def of currentSignalDefs) {
+			yield def;
+		}
+		currentSignalDefs = [];
 		if (result != null && typeof result === "object" && "then" in result) {
 			result = await result;
 		}
@@ -71,23 +91,39 @@ export async function* renderToStream(
 			closingTag = "";
 		}
 
-		if (fnProps.length === 0) {
-			if (children == null || children.length === 0) {
-				yield openingTag + closingTag;
-				return;
-			}
-			yield openingTag;
-			for (let i = 0; i < children.length; i++) {
-				const child = children[i];
-				yield* renderToStream(
-					child as any,
-					`${id}_${i}`,
-					queue,
-					inSuspense,
-					fnsSoFar,
-				);
-			}
-			yield closingTag;
+		if (fnProps.length !== 0) {
+			const fnsDefs = fnProps
+				.filter(([_key, prop]) => !fnsSoFar.includes(prop.id))
+				.map(
+					([_key, prop]) =>
+						`window.__FNS__[${JSON.stringify(String(prop.id))}] = ${prop.module};`,
+				)
+				.join("\n");
+			yield `<script>\n${fnsDefs}\n</script>`;
+			yield `<signal-attrs value='${JSON.stringify(Object.fromEntries(fnProps))}'>`;
 		}
+
+		if (children == null || children.length === 0) {
+			yield openingTag + closingTag;
+			return;
+		}
+		yield openingTag;
+		for (let i = 0; i < children.length; i++) {
+			const child = children[i];
+			yield* renderToStream(
+				child as any,
+				`${id}_${i}`,
+				queue,
+				inSuspense,
+				fnsSoFar,
+			);
+		}
+		yield closingTag;
+
+		if (fnProps.length !== 0) {
+			yield "</signal-attrs>";
+		}
+
+		return;
 	}
 }

@@ -1,4 +1,8 @@
-import { currentID, useSignalIndex } from "../renderer/renderToStream";
+import {
+	addSignalDef,
+	currentID,
+	useSignalIndex,
+} from "../renderer/renderToStream";
 
 export function createSignal<T>(
 	initialValue: T | (() => T),
@@ -15,6 +19,10 @@ export function createSignal<T>(
 		__type: "$$SIGNAL",
 		id: `${id}-${index}`,
 	});
+
+	addSignalDef(
+		`<let-signal id="${valueFn.id}" initial-value='${JSON.stringify(valueFn())}'></let-signal>`,
+	);
 
 	return valueFn;
 }
