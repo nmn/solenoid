@@ -2,6 +2,7 @@ import type { Element } from "../types";
 import { ForEach } from "../components/ForEach";
 import { Suspense } from "../components/Suspense";
 import { When } from "../components/When";
+import { findFns } from "../utils/findFns";
 
 export let currentID = "_0";
 let signalIndex = 0;
@@ -53,6 +54,17 @@ export async function* renderToStream(
 	if (typeof el === "function") {
 		const result = el();
 		const stringified = JSON.stringify(el);
+		const fnProps = findFns(el);
+		if (fnProps.length > 0) {
+			const fnsDefs = fnProps
+				.filter((prop) => !fnsSoFar.includes(prop.id))
+				.map(
+					(prop) =>
+						`window.__FNS__[${JSON.stringify(String(prop.id))}] = ${prop.module};`,
+				)
+				.join("\n");
+			yield `<script>\n${fnsDefs}\n</script>`;
+		}
 		yield `<signal-text value='${stringified}'>${result}</signal-text>`;
 		return;
 	}

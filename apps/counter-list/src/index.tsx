@@ -6,5 +6,5 @@ const stream = renderToStream(<Counter />);
 console.log(stream.next);
 
 for await (const chunk of stream) {
-	console.log("chunk", chunk);
+	console.log("", chunk);
 }
