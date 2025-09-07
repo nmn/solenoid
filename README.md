@@ -1,6 +1,12 @@
 # solenoid
 
-Experimental "resumable" framework that encodes signal graphs in HTML
+Experimental "resumable" framework that encodes signal graphs in HTML. 
+
+Watch ["Compiled Atomic Javascript?"](https://gitnation.com/contents/compiled-atomic-javascript) 
+from React Summit, 2025 for a quick explainer and demo.
+
+(Go to the 13 minute mark for just the most important 1m demo)
+
 
 ## Benefits
 
