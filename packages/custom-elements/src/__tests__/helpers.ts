@@ -5,21 +5,12 @@ import {
 	SOLENOID_CUSTOM_KEY,
 	type SolenoidFunctionConfig,
 } from "../utils/types";
-import { waitFor } from "@testing-library/dom";
-import { expect, vi, type Mock } from "vitest";
+import { vi, type Mock } from "vitest";
 import { createSignal, signalStore } from "../core";
 import { effect, effectScope } from "alien-signals";
 
-export function waitForElement(element: HTMLElement) {
-	return waitFor(() => expect(element.isConnected).toBe(true));
-}
-
 export function randomString() {
 	return Math.random().toString(36).slice(2);
-}
-
-export function waitForElementToBeRemoved(element: HTMLElement) {
-	return waitFor(() => expect(element.parentNode).toBeNull());
 }
 
 export function createMockFunctionJSON<T extends () => unknown>(
