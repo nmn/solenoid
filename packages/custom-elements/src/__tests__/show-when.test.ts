@@ -31,6 +31,9 @@ describe("show-when", () => {
 		element.setAttribute("condition", configJSON);
 		element.append(childElement);
 
+		Object.defineProperty(element, "isConnected", {
+			get: () => true,
+		});
 		await element.connectedCallback();
 		await awaitRepaint();
 
@@ -70,8 +73,14 @@ describe("show-when", () => {
 
 	test("can handle nested show-when's", async () => {
 		const element = document.createElement("show-when") as ShowWhen;
+		Object.defineProperty(element, "isConnected", {
+			get: () => true,
+		});
 
 		const nestedElement = document.createElement("show-when") as ShowWhen;
+		Object.defineProperty(nestedElement, "isConnected", {
+			get: () => true,
+		});
 
 		const childElement = document.createElement("div");
 		childElement.append("signal test for nested show when");
