@@ -15,14 +15,8 @@
 	"repository": "https://github.com/nmn/solenoid",
 	"license": "MIT",
 	"scripts": {
-		"build": "concurrently \"bun run build-types\" \"bun run build-code-base\" \"bun run build-code-components\" \"bun run build-code-hooks\" \"bun run build-code-jsx-runtime\" \"bun run build-code-renderer\" \"bun run build-code-types\" \"bun run build-code-utils\"",
-		"build-code-base": "find ./src/*.ts -exec sh -c 'bun build {} --outfile ./lib/$(basename {} .ts).js --target node --no-bundle' \\;",
-		"build-code-components": "find ./src/components/*.ts -exec sh -c 'bun build {} --outfile ./lib/components/$(basename {} .ts).js --target node --no-bundle' \\;",
-		"build-code-hooks": "find ./src/hooks/*.ts -exec sh -c 'bun build {} --outfile ./lib/hooks/$(basename {} .ts).js --target node --no-bundle' \\;",
-		"build-code-jsx-runtime": "find ./src/jsx-runtime/*.ts -exec sh -c 'bun build {} --outfile ./lib/jsx-runtime/$(basename {} .ts).js --target node --no-bundle' \\;",
-		"build-code-renderer": "find ./src/renderer/*.ts -exec sh -c 'bun build {} --outfile ./lib/renderer/$(basename {} .ts).js --target node --no-bundle' \\;",
-		"build-code-types": "find ./src/types/*.ts -exec sh -c 'bun build {} --outfile ./lib/types/$(basename {} .ts).js --target node --no-bundle' \\;",
-		"build-code-utils": "find ./src/utils/*.ts -exec sh -c 'bun build {} --outfile ./lib/utils/$(basename {} .ts).js --target node --no-bundle' \\;",
+		"build": "concurrently \"bun run build-types\" \"bun run build-code\"",
+		"build-code": "find ./src -name '*.ts' ! -path '*/__tests__/*' ! -name '*.test.ts' ! -name '*.spec.ts' -exec sh -c 'rel=$(echo \"{}\" | sed \"s|^\\./src/||;s|\\.ts\\$|.js|\"); mkdir -p \"./lib/$(dirname \"$rel\")\"; bun build {} --outfile \"./lib/$rel\" --target node --no-bundle' \\;",
 		"build-types": "bun run ./build-types.ts",
 		"test": "vitest"
 	},
